@@ -1,0 +1,15 @@
+language: rust
+sudo: false
+
+script:
+  - echo 'Hello, world!'
+
+after_success:
+  - echo 'Hello, world!'
+
+env:
+  global:
+    - secure: Dn9M2/1BmN+aQM6P1DXLnXcx8k6xjlJosCIOa8wj4wrcnrVVirKET8ECfgaY7qoQF4H+3RIyQjg14wKcBwzCQlcFfRo6leKm1Ie07PSoZtHxSeDbNXGnXXwz7j6f+2TxCIdWFrAddAtFItRbusCGmKsFg51TEBDMyyaX+p5MH6Lnlx7LZyzNvQCoF0rjBQ64ayDHChTI2e/tg9kR0wSuCq9XqrtJKymkoMK1UyXsN2xu2Xp4etCESggql3Bgz1KbrQNzvEiwtup4POuEeJ6TK7f7LKqkliGIs40PMLEiaHUbX2aQW3npw2rCdxCN7f+9LfIevpzgUiWfdDPLa561ont1Lwk5HwZVA9Ot0lAHEh5+Kwde0voqRRCTxXMGo+xtvj9hjGg31Fe1m7KrF+XWYPs5Gmlx6CQFm5EOk/4XFbFDuoKAE8yyHLTwuW3UjR1ZUG9kIcY3VwoirnWeetz+la5Iu1SQ9ftGfQPoNLfNlnpyOuoqS++JCsYOB8R06GbexaOQVLcq6VKm1iS4g1r/yxGZbkc4myGDmYaDA3rQSVgRcp0UQ+8fwtnkv5u+yiXJO23gKuYlwTl/uvbq649Nnq4ct0/pasLUw6wEtP1V48v8p40PzwP9WRpe2GAEuaGvv1hQ++ZP4TQmFRX063DyqED3uAuwU8mtE3sNKbXpYTM=
+
+notifications:
+  email: false
