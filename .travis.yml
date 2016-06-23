@@ -7,19 +7,16 @@ python:
 install:
   - export CC="gcc-4.9"
   - export CXX="g++-4.9"
-
   - pip install --upgrade pip
   - pip install --upgrade numpy
-
-  - curl -OL https://stainless-steel.github.io/travis/bazel.sh && source ./bazel.sh
-  - curl -OL https://stainless-steel.github.io/travis/rust.sh && source ./rust.sh
-
-after_success:
-  - curl https://stainless-steel.github.io/travis/documentation.sh | bash
+  - curl -OL https://stainless-steel.github.io/travis/bazel.sh && source bazel.sh
+  - curl -OL https://stainless-steel.github.io/travis/rust.sh && source rust.sh
 
 script:
-  - cargo test -vv -j 1
-  - cargo run --example=workflow
+  - echo 'Hi, there!'
+
+after_success:
+  - echo 'Hi, there!'
 
 env:
   global:
