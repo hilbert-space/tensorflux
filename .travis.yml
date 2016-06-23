@@ -9,8 +9,8 @@ install:
   - export CXX="g++-4.9"
   - pip install --upgrade pip
   - pip install --upgrade numpy
-  - curl -OL https://stainless-steel.github.io/travis/bazel.sh && source bazel.sh
-  - curl -OL https://stainless-steel.github.io/travis/rust.sh && source rust.sh
+  - curl -LO https://stainless-steel.github.io/travis/bazel.sh && source bazel.sh
+  - curl -LO https://stainless-steel.github.io/travis/rust.sh && source rust.sh
 
 script:
   - echo 'Hi, there!'
