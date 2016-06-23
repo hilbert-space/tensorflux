@@ -1,15 +1,41 @@
-language: rust
+language: python
 sudo: false
 
-script:
-  - echo 'Hello, world!'
+python:
+  - 3.5
+
+install:
+  - export CC="gcc-4.9"
+  - export CXX="g++-4.9"
+
+  - pip install --upgrade pip
+  - pip install --upgrade numpy
+
+  - curl -OL https://stainless-steel.github.io/travis/bazel.sh && source ./bazel.sh
+  - curl -OL https://stainless-steel.github.io/travis/rust.sh && source ./rust.sh
 
 after_success:
-  - echo 'Hello, world!'
+  - curl https://stainless-steel.github.io/travis/documentation.sh | bash
+
+script:
+  - cargo test -vv -j 1
+  - cargo run --example=workflow
 
 env:
   global:
-    - secure: Dn9M2/1BmN+aQM6P1DXLnXcx8k6xjlJosCIOa8wj4wrcnrVVirKET8ECfgaY7qoQF4H+3RIyQjg14wKcBwzCQlcFfRo6leKm1Ie07PSoZtHxSeDbNXGnXXwz7j6f+2TxCIdWFrAddAtFItRbusCGmKsFg51TEBDMyyaX+p5MH6Lnlx7LZyzNvQCoF0rjBQ64ayDHChTI2e/tg9kR0wSuCq9XqrtJKymkoMK1UyXsN2xu2Xp4etCESggql3Bgz1KbrQNzvEiwtup4POuEeJ6TK7f7LKqkliGIs40PMLEiaHUbX2aQW3npw2rCdxCN7f+9LfIevpzgUiWfdDPLa561ont1Lwk5HwZVA9Ot0lAHEh5+Kwde0voqRRCTxXMGo+xtvj9hjGg31Fe1m7KrF+XWYPs5Gmlx6CQFm5EOk/4XFbFDuoKAE8yyHLTwuW3UjR1ZUG9kIcY3VwoirnWeetz+la5Iu1SQ9ftGfQPoNLfNlnpyOuoqS++JCsYOB8R06GbexaOQVLcq6VKm1iS4g1r/yxGZbkc4myGDmYaDA3rQSVgRcp0UQ+8fwtnkv5u+yiXJO23gKuYlwTl/uvbq649Nnq4ct0/pasLUw6wEtP1V48v8p40PzwP9WRpe2GAEuaGvv1hQ++ZP4TQmFRX063DyqED3uAuwU8mtE3sNKbXpYTM=
+    - TRAVIS_RUST_VERSION=nightly
+    - secure: KZn2V3b3Ae7/ez6r1MXep+xfClAW0zAqPac0hZwtjTZJRN5CPShG/ellQM2c//w75EysMIQM0HZ+Ja0XV0/T6eb+ZdYCNJOXeDavMiyWecUYWK2p/PmQnPL6q+s9sr43bZb4snZyDFcpTvSsS+t8P/DGBQ1by+cDdCFpvA8SIW6mMYtIaT2LidUO0AFU9AOxANq3ccyDtDgMDAJAUKzv5grvduz//aPI8uazMHLmUgfoV7bOjLbEHPXBPFXyJ+ezz0OWQqClSizpizbNdgfUoPZM0hct72Y8/8vkNcs7P0CpQqCFKsiFmcSIx6w+EFQxOw9qLzSVtJgbJqQFOQ14slGhK7UB38mI12ME6FqG5pB90UC+1PO9maPMeu+ZxBPMA5JauMTlspeDTKw8rijI5xzbnBvpS9IgMvbsg3XniP27T33Y9Xx2cusrzIBMcV1AMowvezFgRreRCnRk6yvkz/0DmxCoelynghErEUGp02Um55TY0/6Sn0Zw0OSUP6tyVpSi02/9fiRxmfU/NNmNvsuigTJomCxBj/712YkrAhXxJyCraXLlEbCenyGjs9Ny0h4cL95soGdE6ACopLxpsQocI2c4k6LSee+8JdkUmfU1vukVSOJJrSbUKDsFDF4LB0G6InCvZKjyh58CIybinJQg/tXlWXM/kmk1d8LMF9w=
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+
+    packages:
+      - g++-4.9
+      - gcc-4.9
+      - oracle-java8-installer
+      - swig
 
 notifications:
   email: false
