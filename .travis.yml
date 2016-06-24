@@ -1,14 +1,8 @@
 language: python
 sudo: false
 
-python:
-  - 3.5
-
 install:
-  - export CC="gcc-4.9"
-  - export CXX="g++-4.9"
-  - pip install --upgrade pip
-  - pip install --upgrade numpy
+  - export CC="gcc-4.9" CXX="g++-4.9"
   - curl -LO https://stainless-steel.github.io/travis/bazel.sh && source bazel.sh
   - curl -LO https://stainless-steel.github.io/travis/rust.sh && source rust.sh
 
