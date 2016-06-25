@@ -14,4 +14,3 @@ mod status;
 pub use options::Options;
 pub use result::{Error, Result};
 pub use session::Session;
-pub use status::Status;
