@@ -33,13 +33,3 @@ impl Drop for Session {
         unsafe { ffi::TF_DeleteSession(self.raw, status::raw(&self.status)) };
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use {Options, Session};
-
-    #[test]
-    fn new() {
-        Session::new(Options::new().unwrap()).unwrap();
-    }
-}
