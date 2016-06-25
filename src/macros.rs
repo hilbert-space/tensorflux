@@ -43,7 +43,7 @@ macro_rules! nonnull(
 macro_rules! ok(
     ($result:expr) => (match $result {
         Ok(result) => result,
-        Err(error) => raise!(format!("{}", error)),
+        Err(error) => raise!(error.to_string()),
     });
 );
 
