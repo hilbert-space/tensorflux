@@ -19,11 +19,7 @@ impl Session {
         let raw = unsafe { ffi::TF_NewSession(options::raw(&options),
                                               status::raw(&status)) };
         let raw = nonnull!(raw, &status);
-        Ok(Session {
-            options: options,
-            status: status,
-            raw: raw,
-        })
+        Ok(Session { options: options, status: status, raw: raw })
     }
 }
 
