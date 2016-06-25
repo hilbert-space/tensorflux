@@ -1,5 +1,5 @@
 declare! {
-    #[doc = "A data type."]
+    #[doc = "A type."]
     pub struct Type => TF_DataType,
 
     Bool => TF_BOOL,

@@ -1,5 +1,6 @@
 use ffi;
 
+use graph::Graph;
 use options::{self, Options};
 use result::Result;
 use status::{self, Status};
@@ -15,11 +16,16 @@ pub struct Session {
 impl Session {
     /// Create a session.
     pub fn new(options: Options) -> Result<Self> {
-        let status = ok!(Status::new());
+        let status = try!(Status::new());
         let raw = unsafe { ffi::TF_NewSession(options::raw(&options),
                                               status::raw(&status)) };
         let raw = nonnull!(raw, &status);
         Ok(Session { options: options, status: status, raw: raw })
+    }
+
+    /// Append a graph.
+    pub fn append(&mut self, _: Graph) -> Result<()> {
+        Ok(())
     }
 }
 
