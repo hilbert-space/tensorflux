@@ -7,10 +7,10 @@ install:
   - curl -LO https://stainless-steel.github.io/travis/rust.sh && source rust.sh
 
 script:
-  - echo 'Hi, there!'
+  - cargo test -vv -j 1
 
 after_success:
-  - echo 'Hi, there!'
+  - curl https://stainless-steel.github.io/travis/documentation.sh | bash
 
 env:
   global:
