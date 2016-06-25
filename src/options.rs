@@ -9,7 +9,7 @@ pub struct Options {
 
 impl Options {
     /// Create session options.
-    pub fn new() -> Result<Options> {
+    pub fn new() -> Result<Self> {
         Ok(Options { raw: nonnull!(unsafe { ffi::TF_NewSessionOptions() }) })
     }
 }

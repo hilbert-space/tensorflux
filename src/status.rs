@@ -7,7 +7,7 @@ pub struct Status {
 }
 
 impl Status {
-    pub fn new() -> Result<Status> {
+    pub fn new() -> Result<Self> {
         Ok(Status { raw: nonnull!(unsafe { ffi::TF_NewStatus() }) })
     }
 }

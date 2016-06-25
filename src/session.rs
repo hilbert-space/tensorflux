@@ -14,7 +14,7 @@ pub struct Session {
 
 impl Session {
     /// Create a session.
-    pub fn new(options: Options) -> Result<Session> {
+    pub fn new(options: Options) -> Result<Self> {
         let status = ok!(Status::new());
         let raw = unsafe { ffi::TF_NewSession(options::raw(&options),
                                               status::raw(&status)) };
