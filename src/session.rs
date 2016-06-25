@@ -30,6 +30,9 @@ impl Session {
 impl Drop for Session {
     #[inline]
     fn drop(&mut self) {
-        unsafe { ffi::TF_DeleteSession(self.raw, status::raw(&self.status)) };
+        unsafe {
+            ffi::TF_CloseSession(self.raw, status::raw(&self.status));
+            ffi::TF_DeleteSession(self.raw, status::raw(&self.status));
+        }
     }
 }
