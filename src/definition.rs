@@ -1,6 +1,6 @@
+use std::convert::AsRef;
 use std::fs::File;
 use std::io::Read;
-use std::ops::Deref;
 use std::path::Path;
 
 use Result;
@@ -20,25 +20,9 @@ impl Definition {
     }
 }
 
-impl Deref for Definition {
-    type Target = [u8];
-
+impl AsRef<[u8]> for Definition {
     #[inline]
-    fn deref(&self) -> &[u8] {
+    fn as_ref(&self) -> &[u8] {
         &self.data
-    }
-}
-
-impl From<Definition> for Vec<u8> {
-    #[inline]
-    fn from(definition: Definition) -> Vec<u8> {
-        definition.data
-    }
-}
-
-impl From<Vec<u8>> for Definition {
-    #[inline]
-    fn from(data: Vec<u8>) -> Definition {
-        Definition { data: data }
     }
 }

@@ -2,7 +2,6 @@ use ffi;
 use libc::size_t;
 
 use Result;
-use definition::Definition;
 use options::{self, Options};
 use status::{self, Status};
 
@@ -24,9 +23,10 @@ impl Session {
     }
 
     /// Extend the graph.
-    pub fn extend(&mut self, definition: &Definition) -> Result<()> {
-        ok!(ffi!(TF_ExtendGraph(self.raw, definition.as_ptr() as *const _,
-                                definition.len() as size_t, status::raw(&self.status))),
+    pub fn extend<T>(&mut self, definition: T) -> Result<()> where T: AsRef<[u8]> {
+        let data = definition.as_ref();
+        ok!(ffi!(TF_ExtendGraph(self.raw, data.as_ptr() as *const _, data.len() as size_t,
+                                status::raw(&self.status))),
             &self.status);
         Ok(())
     }
