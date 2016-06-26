@@ -1,10 +1,12 @@
-language: python
+language: rust
 sudo: false
+
+cache: cargo
+rust: nightly
 
 install:
   - export CC="gcc-4.9" CXX="g++-4.9"
   - curl -LO https://stainless-steel.github.io/travis/bazel.sh && source bazel.sh
-  - curl -LO https://stainless-steel.github.io/travis/rust.sh && source rust.sh
 
 script:
   - cargo test -vv -j 1
@@ -15,7 +17,6 @@ after_success:
 
 env:
   global:
-    - TRAVIS_RUST_VERSION=nightly
     - secure: KZn2V3b3Ae7/ez6r1MXep+xfClAW0zAqPac0hZwtjTZJRN5CPShG/ellQM2c//w75EysMIQM0HZ+Ja0XV0/T6eb+ZdYCNJOXeDavMiyWecUYWK2p/PmQnPL6q+s9sr43bZb4snZyDFcpTvSsS+t8P/DGBQ1by+cDdCFpvA8SIW6mMYtIaT2LidUO0AFU9AOxANq3ccyDtDgMDAJAUKzv5grvduz//aPI8uazMHLmUgfoV7bOjLbEHPXBPFXyJ+ezz0OWQqClSizpizbNdgfUoPZM0hct72Y8/8vkNcs7P0CpQqCFKsiFmcSIx6w+EFQxOw9qLzSVtJgbJqQFOQ14slGhK7UB38mI12ME6FqG5pB90UC+1PO9maPMeu+ZxBPMA5JauMTlspeDTKw8rijI5xzbnBvpS9IgMvbsg3XniP27T33Y9Xx2cusrzIBMcV1AMowvezFgRreRCnRk6yvkz/0DmxCoelynghErEUGp02Um55TY0/6Sn0Zw0OSUP6tyVpSi02/9fiRxmfU/NNmNvsuigTJomCxBj/712YkrAhXxJyCraXLlEbCenyGjs9Ny0h4cL95soGdE6ACopLxpsQocI2c4k6LSee+8JdkUmfU1vukVSOJJrSbUKDsFDF4LB0G6InCvZKjyh58CIybinJQg/tXlWXM/kmk1d8LMF9w=
 
 addons:
@@ -27,6 +28,7 @@ addons:
       - g++-4.9
       - gcc-4.9
       - oracle-java8-installer
+      - python-numpy
       - swig
 
 notifications:
