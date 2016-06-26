@@ -35,3 +35,10 @@ impl From<Definition> for Vec<u8> {
         definition.data
     }
 }
+
+impl From<Vec<u8>> for Definition {
+    #[inline]
+    fn from(data: Vec<u8>) -> Definition {
+        Definition { data: data }
+    }
+}
