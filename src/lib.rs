@@ -9,8 +9,8 @@ extern crate tensorflow_sys as ffi;
 mod macros;
 
 mod definition;
+mod error;
 mod options;
-mod result;
 mod session;
 mod status;
 
@@ -18,7 +18,10 @@ mod status;
 mod typo;
 
 pub use definition::Definition;
+pub use error::Error;
 pub use options::Options;
-pub use result::{Error, Result};
 pub use session::Session;
 pub use typo::Type;
+
+/// A result.
+pub type Result<T> = std::result::Result<T, Error>;

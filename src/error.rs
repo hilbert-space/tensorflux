@@ -32,9 +32,6 @@ pub struct Error {
     message: String,
 }
 
-/// A result.
-pub type Result<T> = ::std::result::Result<T, Error>;
-
 impl Error {
     /// Return the current error if any.
     pub fn current(status: &Status) -> Option<Self> {

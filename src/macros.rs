@@ -51,12 +51,12 @@ macro_rules! ok(
 );
 
 macro_rules! raise(
-    ($message:expr) => (return Err(::result::Error::from($message)));
+    ($message:expr) => (return Err(::Error::from($message)));
 );
 
 macro_rules! success(
     ($status:expr) => (
-        if let Some(error) = ::result::Error::current($status) {
+        if let Some(error) = ::Error::current($status) {
             return Err(error);
         }
     );

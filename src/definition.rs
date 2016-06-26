@@ -5,13 +5,13 @@ use std::path::Path;
 
 use Result;
 
-/// A graph definition.
+/// A definition.
 pub struct Definition {
     data: Vec<u8>,
 }
 
 impl Definition {
-    /// Load a graph definition.
+    /// Load a definition.
     pub fn load<T: AsRef<Path>>(path: T) -> Result<Self> {
         let mut data = vec![];
         let mut file = ok!(File::open(path));

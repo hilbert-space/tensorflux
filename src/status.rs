@@ -1,6 +1,6 @@
 use ffi;
 
-use result::Result;
+use Result;
 
 pub struct Status {
     raw: *mut ffi::TF_Status,

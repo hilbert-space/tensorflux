@@ -1,9 +1,9 @@
 use ffi;
 use libc::size_t;
 
+use Result;
 use definition::Definition;
 use options::{self, Options};
-use result::Result;
 use status::{self, Status};
 
 /// A session.
@@ -23,7 +23,7 @@ impl Session {
         Ok(Session { options: options, status: status, raw: raw })
     }
 
-    /// Append nodes to the graph.
+    /// Extend the graph.
     pub fn extend(&mut self, definition: &Definition) -> Result<()> {
         ok!(ffi!(TF_ExtendGraph(self.raw, definition.as_ptr() as *const _,
                                 definition.len() as size_t, status::raw(&self.status))),
