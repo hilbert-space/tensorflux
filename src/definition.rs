@@ -5,22 +5,22 @@ use std::path::Path;
 
 use Result;
 
-/// A graph.
-pub struct Graph {
+/// A graph definition.
+pub struct Definition {
     data: Vec<u8>,
 }
 
-impl Graph {
-    /// Load a graph.
+impl Definition {
+    /// Load a graph definition.
     pub fn load<T: AsRef<Path>>(path: T) -> Result<Self> {
         let mut data = vec![];
         let mut file = ok!(File::open(path));
         ok!(file.read_to_end(&mut data));
-        Ok(Graph { data: data })
+        Ok(Definition { data: data })
     }
 }
 
-impl Deref for Graph {
+impl Deref for Definition {
     type Target = [u8];
 
     #[inline]
@@ -29,9 +29,9 @@ impl Deref for Graph {
     }
 }
 
-impl From<Graph> for Vec<u8> {
+impl From<Definition> for Vec<u8> {
     #[inline]
-    fn from(graph: Graph) -> Vec<u8> {
-        graph.data
+    fn from(definition: Definition) -> Vec<u8> {
+        definition.data
     }
 }

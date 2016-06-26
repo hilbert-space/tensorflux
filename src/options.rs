@@ -2,13 +2,13 @@ use ffi;
 
 use result::Result;
 
-/// Options.
+/// Session options.
 pub struct Options {
     raw: *mut ffi::TF_SessionOptions,
 }
 
 impl Options {
-    /// Create options.
+    /// Create session options.
     pub fn new() -> Result<Self> {
         Ok(Options { raw: nonnull!(ffi!(TF_NewSessionOptions())) })
     }

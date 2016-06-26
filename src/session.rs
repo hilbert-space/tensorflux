@@ -1,7 +1,7 @@
 use ffi;
 use libc::size_t;
 
-use graph::Graph;
+use definition::Definition;
 use options::{self, Options};
 use result::Result;
 use status::{self, Status};
@@ -23,10 +23,11 @@ impl Session {
         Ok(Session { options: options, status: status, raw: raw })
     }
 
-    /// Append the nodes of a graph.
-    pub fn extend(&mut self, graph: &Graph) -> Result<()> {
-        ok!(ffi!(TF_ExtendGraph(self.raw, graph.as_ptr() as *const _, graph.len() as size_t,
-                                status::raw(&self.status))), &self.status);
+    /// Append nodes to the graph.
+    pub fn extend(&mut self, definition: &Definition) -> Result<()> {
+        ok!(ffi!(TF_ExtendGraph(self.raw, definition.as_ptr() as *const _,
+                                definition.len() as size_t, status::raw(&self.status))),
+            &self.status);
         Ok(())
     }
 }
