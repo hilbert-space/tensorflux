@@ -28,6 +28,12 @@ pub struct Output {
     name: CString,
 }
 
+/// A target.
+#[allow(dead_code)]
+pub struct Target {
+    name: CString,
+}
+
 trait Flexor {}
 
 impl Session {
@@ -49,7 +55,7 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run(&mut self, _: Vec<Input>, _: Vec<Output>) -> Result<()> {
+    pub fn run(&mut self, _: Vec<Input>, _: Vec<Output>, _: Vec<Target>) -> Result<()> {
         Ok(())
     }
 }
@@ -78,6 +84,16 @@ impl Output {
     #[inline]
     pub fn new<T>(name: T) -> Self where T: Into<String> {
         Output {
+            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
+        }
+    }
+}
+
+impl Target {
+    /// Create a target.
+    #[inline]
+    pub fn new<T>(name: T) -> Self where T: Into<String> {
+        Target {
             name: unsafe { CString::from_vec_unchecked(name.into().into()) },
         }
     }
