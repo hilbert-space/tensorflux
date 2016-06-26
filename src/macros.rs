@@ -33,6 +33,7 @@ macro_rules! ok(
 );
 
 macro_rules! raise(
+    ($template:expr, $($argument:tt)*) => (raise!(format!($template, $($argument)*)));
     ($message:expr) => (return Err(::Error::from($message)));
 );
 

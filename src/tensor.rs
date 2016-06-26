@@ -15,10 +15,14 @@ pub struct Tensor<T> {
 impl<T> Tensor<T> where T: Value {
     /// Create a tensor.
     pub fn new(mut data: Vec<T>, dimensions: &[usize]) -> Result<Self> {
+        let (given, needed) = (data.len(), dimensions.iter().fold(1, |p, &d| p * d));
+        if needed > given {
+            raise!("there should be at least {} data point(s)", needed);
+        }
         let mut dimensions = dimensions.iter().map(|&d| d as c_longlong).collect::<Vec<_>>();
         let raw = nonnull!(ffi!(TF_NewTensor(T::kind().into(), dimensions.as_mut_ptr(),
                                 dimensions.len() as c_int, data.as_mut_ptr() as *mut _,
-                                data.len() as size_t, Some(noop), ptr::null_mut())));
+                                needed as size_t, Some(noop), ptr::null_mut())));
         Ok(Tensor { data: data, raw: raw })
     }
 }
