@@ -1,24 +1,6 @@
-macro_rules! declare {
-    (
-        $(#[$attribute:meta])*
-        pub struct $native_type:ident => $foreign_type:ident,
-        $($native_variant:ident => $foreign_variant:ident,)*
-    ) => {
-        $(#[$attribute])*
-        #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-        pub enum $native_type {
-            $($native_variant,)*
-        }
-
-        impl From<::ffi::$foreign_type> for $native_type {
-            fn from(variant: ::ffi::$foreign_type) -> Self {
-                match variant {
-                    $(::ffi::$foreign_variant => $native_type::$native_variant,)*
-                }
-            }
-        }
-    }
-}
+macro_rules! ffi(
+    ($function:ident($($argument:expr),*)) => (unsafe { ::ffi::$function($($argument),*) });
+);
 
 macro_rules! nonnull(
     ($pointer:expr, $status:expr) => ({
@@ -62,6 +44,25 @@ macro_rules! success(
     );
 );
 
-macro_rules! ffi(
-    ($function:ident($($argument:expr),*)) => (unsafe { ::ffi::$function($($argument),*) });
-);
+macro_rules! translate {
+    (
+        $(#[$attribute:meta])*
+        pub struct $from_type:ident => $into_type:ident,
+        $($from_variant:ident => $into_variant:ident,)*
+    ) => {
+        $(#[$attribute])*
+        #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+        pub enum $from_type {
+            $($from_variant,)*
+        }
+
+        impl From<::ffi::$into_type> for $from_type {
+            fn from(variant: ::ffi::$into_type) -> Self {
+                match variant {
+                    $(::ffi::$into_variant => $from_type::$from_variant,)*
+                }
+            }
+        }
+    }
+}
+

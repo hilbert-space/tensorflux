@@ -3,7 +3,7 @@ use std::{error, fmt};
 
 use status::{self, Status};
 
-declare! {
+translate! {
     pub struct Code => TF_Code,
 
     OK => TF_OK,
