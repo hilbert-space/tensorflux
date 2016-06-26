@@ -136,7 +136,7 @@ impl Target {
 }
 
 impl<T> Flexor for Tensor<T> {
-    #[inline]
+    #[inline(always)]
     fn unwrap(&mut self) -> *mut ffi::TF_Tensor {
         tensor::unwrap(self)
     }

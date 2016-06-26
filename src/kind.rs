@@ -31,14 +31,12 @@ pub trait Value {
 
 macro_rules! implement {
     ($($native:ident => $variant:ident,)*) => {
-        $(
-            impl Value for $native {
-                #[inline]
-                fn kind() -> Type {
-                    Type::$variant
-                }
+        $(impl Value for $native {
+            #[inline]
+            fn kind() -> Type {
+                Type::$variant
             }
-        )*
+        })*
     }
 }
 
