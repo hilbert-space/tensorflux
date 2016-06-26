@@ -20,7 +20,7 @@ pub use definition::Definition;
 pub use error::Error;
 pub use kind::{Type, Value};
 pub use options::Options;
-pub use session::Session;
+pub use session::{Input, Output, Session};
 pub use tensor::Tensor;
 
 /// A result.

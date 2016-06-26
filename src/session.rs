@@ -1,6 +1,5 @@
 use ffi;
 use libc::size_t;
-use std::collections::{HashMap, HashSet};
 use std::ffi::CString;
 
 use Result;
@@ -13,9 +12,20 @@ pub struct Session {
     #[allow(dead_code)]
     options: Options,
     status: Status,
-    inputs: HashMap<CString, Box<Flexor>>,
-    outputs: HashSet<CString>,
     raw: *mut ffi::TF_Session,
+}
+
+/// An input.
+#[allow(dead_code)]
+pub struct Input {
+    name: CString,
+    tensor: Box<Flexor>,
+}
+
+/// An output.
+#[allow(dead_code)]
+pub struct Output {
+    name: CString,
 }
 
 trait Flexor {}
@@ -26,13 +36,7 @@ impl Session {
         let status = try!(Status::new());
         let raw = nonnull!(ffi!(TF_NewSession(options::raw(&options), status::raw(&status))),
                            &status);
-        Ok(Session {
-            options: options,
-            status: status,
-            inputs: HashMap::new(),
-            outputs: HashSet::new(),
-            raw: raw,
-        })
+        Ok(Session { options: options, status: status, raw: raw })
     }
 
     /// Extend the graph.
@@ -44,17 +48,8 @@ impl Session {
         Ok(())
     }
 
-    /// Set an input.
-    pub fn input<T, U>(&mut self, name: T, tensor: Tensor<U>) -> Result<()>
-        where T: Into<Vec<u8>>, U: 'static
-    {
-        self.inputs.insert(ok!(CString::new(name)), Box::new(tensor));
-        Ok(())
-    }
-
-    /// Set an output.
-    pub fn output<T>(&mut self, name: T) -> Result<()> where T: Into<Vec<u8>> {
-        self.outputs.insert(ok!(CString::new(name)));
+    /// Run the graph.
+    pub fn run(&mut self, _: Vec<Input>, _: Vec<Output>) -> Result<()> {
         Ok(())
     }
 }
@@ -64,6 +59,27 @@ impl Drop for Session {
     fn drop(&mut self) {
         ffi!(TF_CloseSession(self.raw, status::raw(&self.status)));
         ffi!(TF_DeleteSession(self.raw, status::raw(&self.status)));
+    }
+}
+
+impl Input {
+    /// Create an input.
+    #[inline]
+    pub fn new<T, U>(name: T, tensor: Tensor<U>) -> Self where T: Into<String>, U: 'static {
+        Input {
+            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
+            tensor: Box::new(tensor),
+        }
+    }
+}
+
+impl Output {
+    /// Create an output.
+    #[inline]
+    pub fn new<T>(name: T) -> Self where T: Into<String> {
+        Output {
+            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
+        }
     }
 }
 
