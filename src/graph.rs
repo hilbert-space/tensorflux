@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Read;
+use std::ops::Deref;
 use std::path::Path;
 
 use Result;
@@ -16,6 +17,15 @@ impl Graph {
         let mut file = ok!(File::open(path));
         ok!(file.read_to_end(&mut data));
         Ok(Graph { data: data })
+    }
+}
+
+impl Deref for Graph {
+    type Target = [u8];
+
+    #[inline]
+    fn deref(&self) -> &[u8] {
+        &self.data
     }
 }
 

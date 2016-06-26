@@ -8,8 +8,8 @@ macro_rules! ok(($result:expr) => ($result.unwrap()));
 
 #[allow(unused_variables)]
 fn main() {
+    let graph = ok!(Graph::load(GRAPH_PATH)); // c = a * b
     let options = ok!(Options::new());
     let mut session = ok!(Session::new(options));
-    let graph = ok!(Graph::load(GRAPH_PATH)); // c = a * b
-    ok!(session.append(graph));
+    ok!(session.extend(&graph));
 }

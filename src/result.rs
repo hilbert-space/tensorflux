@@ -1,4 +1,3 @@
-use ffi;
 use std::ffi::CStr;
 use std::{error, fmt};
 
@@ -39,11 +38,11 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 impl Error {
     /// Return the current error if any.
     pub fn current(status: &Status) -> Option<Self> {
-        let code = Code::from(unsafe { ffi::TF_GetCode(status::raw(status)) });
+        let code = Code::from(ffi!(TF_GetCode(status::raw(status))));
         if code == Code::OK {
             return None;
         }
-        let message = unsafe { ffi::TF_Message(status::raw(status)) };
+        let message = ffi!(TF_Message(status::raw(status)));
         if message.is_null() {
             return None;
         }

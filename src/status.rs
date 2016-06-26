@@ -8,14 +8,14 @@ pub struct Status {
 
 impl Status {
     pub fn new() -> Result<Self> {
-        Ok(Status { raw: nonnull!(unsafe { ffi::TF_NewStatus() }) })
+        Ok(Status { raw: nonnull!(ffi!(TF_NewStatus())) })
     }
 }
 
 impl Drop for Status {
     #[inline]
     fn drop(&mut self) {
-        unsafe { ffi::TF_DeleteStatus(self.raw) };
+        ffi!(TF_DeleteStatus(self.raw));
     }
 }
 

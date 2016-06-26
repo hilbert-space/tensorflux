@@ -2,6 +2,7 @@
 //!
 //! [1]: https://www.tensorflow.org
 
+extern crate libc;
 extern crate tensorflow_sys as ffi;
 
 #[macro_use]

@@ -24,9 +24,7 @@ macro_rules! nonnull(
     ($pointer:expr, $status:expr) => ({
         let pointer = $pointer;
         if pointer.is_null() {
-            if let Some(error) = ::result::Error::current($status) {
-                return Err(error);
-            }
+            success!($status);
             raise!("failed to call TensorFlow");
         }
         pointer
@@ -41,6 +39,11 @@ macro_rules! nonnull(
 );
 
 macro_rules! ok(
+    ($operation:expr, $status:expr) => ({
+        let result = $operation;
+        success!($status);
+        result
+    });
     ($result:expr) => (match $result {
         Ok(result) => result,
         Err(error) => raise!(error.to_string()),
@@ -49,4 +52,16 @@ macro_rules! ok(
 
 macro_rules! raise(
     ($message:expr) => (return Err(::result::Error::from($message)));
+);
+
+macro_rules! success(
+    ($status:expr) => (
+        if let Some(error) = ::result::Error::current($status) {
+            return Err(error);
+        }
+    );
+);
+
+macro_rules! ffi(
+    ($function:ident($($argument:expr),*)) => (unsafe { ::ffi::$function($($argument),*) });
 );

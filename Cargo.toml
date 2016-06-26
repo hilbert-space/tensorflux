@@ -9,4 +9,5 @@ homepage = "https://github.com/stainless-steel/tensorflux"
 repository = "https://github.com/stainless-steel/tensorflux"
 
 [dependencies]
+libc = "0.2"
 tensorflow-sys = "0.3"

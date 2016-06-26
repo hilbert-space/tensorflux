@@ -10,14 +10,14 @@ pub struct Options {
 impl Options {
     /// Create options.
     pub fn new() -> Result<Self> {
-        Ok(Options { raw: nonnull!(unsafe { ffi::TF_NewSessionOptions() }) })
+        Ok(Options { raw: nonnull!(ffi!(TF_NewSessionOptions())) })
     }
 }
 
 impl Drop for Options {
     #[inline]
     fn drop(&mut self) {
-        unsafe { ffi::TF_DeleteSessionOptions(self.raw) };
+        ffi!(TF_DeleteSessionOptions(self.raw));
     }
 }
 
