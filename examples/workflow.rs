@@ -14,5 +14,6 @@ fn main() {
     let definition = ok!(Definition::load(GRAPH_PATH)); // c = a * b
     ok!(session.extend(&definition));
 
-    let tensor = Tensor::new(vec![1f32, 2f32, 3f32], &[3]);
+    let tensor = ok!(Tensor::new(vec![1f32, 2f32, 3f32], &[3]));
+    let tensor = ok!(Tensor::new(vec![4f32, 5f32, 6f32], &[3]));
 }
