@@ -1,11 +1,12 @@
 use ffi;
-use libc::size_t;
+use libc::{c_int, size_t};
 use std::ffi::CString;
+use std::ptr;
 
 use Result;
 use options::{self, Options};
 use status::{self, Status};
-use tensor::Tensor;
+use tensor::{self, Tensor};
 
 /// A session.
 pub struct Session {
@@ -34,7 +35,9 @@ pub struct Target {
     name: CString,
 }
 
-trait Flexor {}
+trait Flexor {
+    fn unwrap(&mut self) -> *mut ffi::TF_Tensor;
+}
 
 impl Session {
     /// Create a session.
@@ -55,7 +58,40 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run(&mut self, _: Vec<Input>, _: Vec<Output>, _: Vec<Target>) -> Result<()> {
+    pub fn run(&mut self, mut inputs: Vec<Input>, outputs: Vec<Output>, targets: Vec<Target>)
+               -> Result<()>
+    {
+        let ni = inputs.len();
+        let mut input_names = vec![ptr::null(); ni];
+        let mut input_tensors = vec![ptr::null_mut(); ni];
+        for i in 0..ni {
+            input_names[i] = inputs[i].name.as_ptr();
+            input_tensors[i] = inputs[i].tensor.unwrap();
+        }
+
+        let no = outputs.len();
+        let mut output_names = vec![ptr::null(); no];
+        let mut output_tensors = vec![ptr::null_mut(); no];
+        for i in 0..no {
+            output_names[i] = outputs[i].name.as_ptr();
+        }
+
+        let nt = targets.len();
+        let mut target_names = vec![ptr::null(); nt];
+        for i in 0..nt {
+            target_names[i] = targets[i].name.as_ptr();
+        }
+
+        ok!(ffi!(TF_Run(self.raw, ptr::null(), input_names.as_mut_ptr(),
+                        input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
+                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
+                        nt as c_int, ptr::null_mut(), status::raw(&self.status))),
+            &self.status);
+
+        for i in 0..no {
+            ffi!(TF_DeleteTensor(output_tensors[i]));
+        }
+
         Ok(())
     }
 }
@@ -99,4 +135,9 @@ impl Target {
     }
 }
 
-impl<T> Flexor for Tensor<T> {}
+impl<T> Flexor for Tensor<T> {
+    #[inline]
+    fn unwrap(&mut self) -> *mut ffi::TF_Tensor {
+        tensor::unwrap(self)
+    }
+}

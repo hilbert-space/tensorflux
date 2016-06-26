@@ -1,6 +1,6 @@
 use ffi;
 use libc::{c_int, c_longlong, c_void, size_t};
-use std::ptr;
+use std::{mem, ptr};
 
 use Result;
 use kind::Value;
@@ -30,8 +30,15 @@ impl<T> Tensor<T> where T: Value {
 impl<T> Drop for Tensor<T> {
     #[inline]
     fn drop(&mut self) {
-        ffi!(TF_DeleteTensor(self.raw));
+        if !self.raw.is_null() {
+            ffi!(TF_DeleteTensor(self.raw));
+        }
     }
+}
+
+#[inline(always)]
+pub fn unwrap<T>(tensor: &mut Tensor<T>) -> *mut ffi::TF_Tensor {
+    mem::replace(&mut tensor.raw, ptr::null_mut())
 }
 
 unsafe extern "C" fn noop(_: *mut c_void, _: size_t, _: *mut c_void) {}
