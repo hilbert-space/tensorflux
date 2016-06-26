@@ -19,4 +19,6 @@ fn main() {
 
     let tensor = ok!(Tensor::new(vec![4f32, 5f32, 6f32], &[3]));
     ok!(session.input("b:0", tensor));
+
+    ok!(session.output("c:0"));
 }

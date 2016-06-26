@@ -1,6 +1,6 @@
 use ffi;
 use libc::size_t;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ffi::CString;
 
 use Result;
@@ -14,6 +14,7 @@ pub struct Session {
     options: Options,
     status: Status,
     inputs: HashMap<CString, Box<Flexor>>,
+    outputs: HashSet<CString>,
     raw: *mut ffi::TF_Session,
 }
 
@@ -29,6 +30,7 @@ impl Session {
             options: options,
             status: status,
             inputs: HashMap::new(),
+            outputs: HashSet::new(),
             raw: raw,
         })
     }
@@ -43,10 +45,16 @@ impl Session {
     }
 
     /// Set an input.
-    pub fn input<N, T>(&mut self, name: N, tensor: Tensor<T>) -> Result<()>
-        where N: Into<Vec<u8>>, T: 'static
+    pub fn input<T, U>(&mut self, name: T, tensor: Tensor<U>) -> Result<()>
+        where T: Into<Vec<u8>>, U: 'static
     {
         self.inputs.insert(ok!(CString::new(name)), Box::new(tensor));
+        Ok(())
+    }
+
+    /// Set an output.
+    pub fn output<T>(&mut self, name: T) -> Result<()> where T: Into<Vec<u8>> {
+        self.outputs.insert(ok!(CString::new(name)));
         Ok(())
     }
 }
