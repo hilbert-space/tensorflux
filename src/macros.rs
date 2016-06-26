@@ -63,6 +63,14 @@ macro_rules! translate {
                 }
             }
         }
+
+        impl From<$from_type> for ::ffi::$into_type {
+            fn from(variant: $from_type) -> Self {
+                match variant {
+                    $($from_type::$from_variant => ::ffi::$into_variant,)*
+                }
+            }
+        }
     }
 }
 

@@ -14,12 +14,14 @@ mod kind;
 mod options;
 mod session;
 mod status;
+mod tensor;
 
 pub use definition::Definition;
 pub use error::Error;
 pub use kind::{Type, Value};
 pub use options::Options;
 pub use session::Session;
+pub use tensor::Tensor;
 
 /// A result.
 pub type Result<T> = std::result::Result<T, Error>;
