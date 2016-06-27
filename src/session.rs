@@ -1,7 +1,7 @@
 use ffi;
 use libc::{c_int, size_t};
 use std::ffi::CString;
-use std::ptr;
+use std::{mem, ptr};
 
 use Result;
 use kind::Value;
@@ -136,7 +136,9 @@ impl Output {
 
     #[inline]
     fn set(&mut self, tensor: *mut ffi::TF_Tensor) {
-        self.tensor = Some(tensor);
+        if let Some(tensor) = mem::replace(&mut self.tensor, Some(tensor)) {
+            ffi!(TF_DeleteTensor(tensor));
+        }
     }
 }
 
