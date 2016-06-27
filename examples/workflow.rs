@@ -6,7 +6,6 @@ const GRAPH_PATH: &'static str = "examples/fixtures/graph.pb";
 
 macro_rules! ok(($result:expr) => ($result.unwrap()));
 
-#[allow(unused_variables)]
 fn main() {
     let mut session = ok!(Session::new(ok!(Options::new())));
     ok!(session.extend(&ok!(Definition::load(GRAPH_PATH)))); // c = a * b
