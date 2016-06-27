@@ -11,7 +11,7 @@ pub struct Tensor<T> {
     #[allow(dead_code)]
     data: Vec<T>,
     drop: bool,
-    raw: *mut ffi::TF_Tensor,
+    raw: Option<*mut ffi::TF_Tensor>,
 }
 
 impl<T> Tensor<T> where T: Value {
@@ -25,7 +25,7 @@ impl<T> Tensor<T> where T: Value {
         let raw = nonnull!(ffi!(TF_NewTensor(T::kind().into(), dimensions.as_mut_ptr(),
                                 dimensions.len() as c_int, data.as_mut_ptr() as *mut _,
                                 needed as size_t, Some(noop), ptr::null_mut())));
-        Ok(Tensor { data: data, drop: true, raw: raw })
+        Ok(Tensor { data: data, drop: true, raw: Some(raw) })
     }
 }
 
@@ -51,15 +51,15 @@ impl<T> Drop for Tensor<T> {
         if !self.drop {
             mem::forget(mem::replace(&mut self.data, vec![]));
         }
-        if !self.raw.is_null() {
-            ffi!(TF_DeleteTensor(self.raw));
+        if let Some(raw) = self.raw.take() {
+            ffi!(TF_DeleteTensor(raw));
         }
     }
 }
 
 #[inline(always)]
 pub fn unwrap<T>(tensor: &mut Tensor<T>) -> *mut ffi::TF_Tensor {
-    mem::replace(&mut tensor.raw, ptr::null_mut())
+    tensor.raw.take().unwrap_or_else(|| ptr::null_mut())
 }
 
 unsafe extern "C" fn noop(_: *mut c_void, _: size_t, _: *mut c_void) {}
