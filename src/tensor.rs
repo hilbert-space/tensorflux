@@ -32,12 +32,14 @@ impl<T> Tensor<T> where T: Value {
 impl<T> Deref for Tensor<T> {
     type Target = [T];
 
+    #[inline(always)]
     fn deref(&self) -> &[T] {
         &self.data
     }
 }
 
 impl<T> DerefMut for Tensor<T> {
+    #[inline(always)]
     fn deref_mut(&mut self) -> &mut [T] {
         &mut self.data
     }
