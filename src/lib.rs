@@ -16,8 +16,8 @@
 //! let a = ok!(Tensor::new(vec![1f32, 2.0, 3.0], &[3]));
 //! let b = ok!(Tensor::new(vec![4f32, 5.0, 6.0], &[3]));
 //!
-//! let inputs = vec![Input::new("a:0", a), Input::new("b:0", b)];
-//! let mut outputs = vec![Output::new("c:0")];
+//! let inputs = vec![Input::new("a", a), Input::new("b", b)];
+//! let mut outputs = vec![Output::new("c")];
 //!
 //! ok!(session.run(inputs, &mut outputs, vec![]));
 //!
