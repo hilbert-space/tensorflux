@@ -9,18 +9,16 @@ The package provides an interface to [TensorFlow][tensorflow].
 ```rust
 use tensorflux::{Definition, Input, Options, Output, Session, Tensor};
 
-macro_rules! ok(($result:expr) => ($result.unwrap()));
+let mut session = Session::new(Options::new().unwrap()).unwrap();
+session.extend(&Definition::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
 
-let mut session = ok!(Session::new(ok!(Options::new())));
-ok!(session.extend(&ok!(Definition::load(GRAPH_PATH)))); // c = a * b
-
-let a = ok!(Tensor::new(vec![1f32, 2.0, 3.0], &[3]));
-let b = ok!(Tensor::new(vec![4f32, 5.0, 6.0], &[3]));
+let a = Tensor::new(vec![1f32, 2.0, 3.0], &[3]).unwrap();
+let b = Tensor::new(vec![4f32, 5.0, 6.0], &[3]).unwrap();
 
 let inputs = vec![Input::new("a", a), Input::new("b", b)];
 let mut outputs = vec![Output::new("c")];
 
-ok!(session.run(inputs, &mut outputs, vec![]));
+session.run(inputs, &mut outputs, vec![]).unwrap();
 
 let c: Tensor<f32> = outputs.pop().unwrap().into().unwrap();
 
