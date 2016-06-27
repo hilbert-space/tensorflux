@@ -4,11 +4,10 @@ use std::ops::{Deref, DerefMut};
 use std::{mem, ptr};
 
 use Result;
-use kind::Value;
+use kind::{Type, Value};
 
 /// A tensor.
 pub struct Tensor<T> {
-    #[allow(dead_code)]
     data: Vec<T>,
     drop: bool,
     raw: Option<*mut ffi::TF_Tensor>,
@@ -57,8 +56,23 @@ impl<T> Drop for Tensor<T> {
     }
 }
 
-pub fn from_raw<T>(_: *mut ffi::TF_Tensor) -> Result<Tensor<T>> where T: Value {
-    unreachable!();
+pub fn from_raw<T>(raw: *mut ffi::TF_Tensor) -> Result<Tensor<T>> where T: Value {
+    if Type::from(ffi!(TF_TensorType(raw))) != T::kind() {
+        raise!("the data types do not match");
+    }
+
+    let count = ffi!(TF_NumDims(raw)) as usize;
+    let mut size = 1;
+    let mut dimensions = vec![0; count];
+    for i in 0..count {
+        dimensions[i] = ffi!(TF_Dim(raw, i as c_int)) as usize;
+        size *= dimensions[i];
+    }
+
+    let pointer = nonnull!(ffi!(TF_TensorData(raw)));
+    let data = unsafe { Vec::from_raw_parts(pointer as *mut _, size, size) };
+
+    Ok(Tensor { data: data, drop: false, raw: Some(raw) })
 }
 
 #[inline(always)]
