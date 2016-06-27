@@ -27,7 +27,7 @@ assert_eq!(&c[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
 
 ## [Requirements][requirements]
 
-## [Compilation][compilation]
+## [Configuration][configuration]
 
 ## Contribution
 
@@ -35,7 +35,7 @@ Your contribution is highly appreciated. Do not hesitate to open an issue or a
 pull request. Note that any contribution submitted for inclusion in the project
 will be licensed according to the terms given in [LICENSE.md](LICENSE.md).
 
-[compilation]: https://github.com/stainless-steel/tensorflow-sys#compilation
+[configuration]: https://github.com/stainless-steel/tensorflow-sys#configuration
 [documentation]: https://stainless-steel.github.io/tensorflux
 [example]: examples/workflow.rs
 [requirements]: https://github.com/stainless-steel/tensorflow-sys#requirements
