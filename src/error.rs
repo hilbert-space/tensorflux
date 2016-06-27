@@ -35,11 +35,11 @@ pub struct Error {
 impl Error {
     /// Return the current error if any.
     pub fn current(status: &Status) -> Option<Self> {
-        let code = Code::from(ffi!(TF_GetCode(status::raw(status))));
+        let code = Code::from(ffi!(TF_GetCode(status::as_raw(status))));
         if code == Code::OK {
             return None;
         }
-        let message = ffi!(TF_Message(status::raw(status)));
+        let message = ffi!(TF_Message(status::as_raw(status)));
         if message.is_null() {
             return None;
         }

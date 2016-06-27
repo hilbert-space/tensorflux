@@ -22,6 +22,6 @@ impl Drop for Options {
 }
 
 #[inline(always)]
-pub fn raw(options: &Options) -> *mut ffi::TF_SessionOptions {
+pub fn as_raw(options: &Options) -> *mut ffi::TF_SessionOptions {
     options.raw
 }

@@ -4,6 +4,7 @@ use std::ffi::CString;
 use std::ptr;
 
 use Result;
+use kind::Value;
 use options::{self, Options};
 use status::{self, Status};
 use tensor::{self, Tensor};
@@ -25,9 +26,9 @@ pub struct Input {
 
 /// An output.
 #[allow(dead_code)]
-pub struct Output<'l> {
+pub struct Output {
     name: CString,
-    tensor: &'l mut Flexor,
+    tensor: Option<*mut ffi::TF_Tensor>,
 }
 
 /// A target.
@@ -37,14 +38,14 @@ pub struct Target {
 }
 
 trait Flexor {
-    fn unwrap(&mut self) -> *mut ffi::TF_Tensor;
+    fn into_raw(&mut self) -> *mut ffi::TF_Tensor;
 }
 
 impl Session {
     /// Create a session.
     pub fn new(options: Options) -> Result<Self> {
         let status = try!(Status::new());
-        let raw = nonnull!(ffi!(TF_NewSession(options::raw(&options), status::raw(&status))),
+        let raw = nonnull!(ffi!(TF_NewSession(options::as_raw(&options), status::as_raw(&status))),
                            &status);
         Ok(Session { options: options, status: status, raw: raw })
     }
@@ -53,13 +54,13 @@ impl Session {
     pub fn extend<T>(&mut self, definition: T) -> Result<()> where T: AsRef<[u8]> {
         let data = definition.as_ref();
         ok!(ffi!(TF_ExtendGraph(self.raw, data.as_ptr() as *const _, data.len() as size_t,
-                                status::raw(&self.status))),
+                                status::as_raw(&self.status))),
             &self.status);
         Ok(())
     }
 
     /// Run the graph.
-    pub fn run<'l>(&mut self, mut inputs: Vec<Input>, outputs: Vec<Output<'l>>,
+    pub fn run<'l>(&mut self, mut inputs: Vec<Input>, outputs: &mut [Output],
                    targets: Vec<Target>) -> Result<()>
     {
         let ni = inputs.len();
@@ -67,7 +68,7 @@ impl Session {
         let mut input_tensors = vec![ptr::null_mut(); ni];
         for i in 0..ni {
             input_names[i] = inputs[i].name.as_ptr();
-            input_tensors[i] = inputs[i].tensor.unwrap();
+            input_tensors[i] = inputs[i].tensor.into_raw();
         }
 
         let no = outputs.len();
@@ -86,11 +87,11 @@ impl Session {
         ok!(ffi!(TF_Run(self.raw, ptr::null(), input_names.as_mut_ptr(),
                         input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
                         output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
-                        nt as c_int, ptr::null_mut(), status::raw(&self.status))),
+                        nt as c_int, ptr::null_mut(), status::as_raw(&self.status))),
             &self.status);
 
         for i in 0..no {
-            ffi!(TF_DeleteTensor(output_tensors[i]));
+            outputs[i].set(output_tensors[i]);
         }
 
         Ok(())
@@ -100,8 +101,8 @@ impl Session {
 impl Drop for Session {
     #[inline]
     fn drop(&mut self) {
-        ffi!(TF_CloseSession(self.raw, status::raw(&self.status)));
-        ffi!(TF_DeleteSession(self.raw, status::raw(&self.status)));
+        ffi!(TF_CloseSession(self.raw, status::as_raw(&self.status)));
+        ffi!(TF_DeleteSession(self.raw, status::as_raw(&self.status)));
     }
 }
 
@@ -118,16 +119,27 @@ impl Input {
     }
 }
 
-impl<'l> Output<'l> {
+impl Output {
     /// Create an output.
     #[inline]
-    pub fn new<T, U>(name: T, tensor: &'l mut Tensor<U>) -> Self
-        where T: Into<String>, U: 'static
-    {
+    pub fn new<T>(name: T) -> Self where T: Into<String> {
         Output {
             name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-            tensor: tensor,
+            tensor: None,
         }
+    }
+
+    /// Convert into a tensor.
+    pub fn into<T>(mut self) -> Result<Tensor<T>> where T: Value {
+        match self.tensor.take() {
+            Some(tensor) => tensor::from_raw(tensor),
+            _ => raise!("the output has not been processed"),
+        }
+    }
+
+    #[inline]
+    fn set(&mut self, tensor: *mut ffi::TF_Tensor) {
+        self.tensor = Some(tensor);
     }
 }
 
@@ -143,7 +155,7 @@ impl Target {
 
 impl<T> Flexor for Tensor<T> {
     #[inline(always)]
-    fn unwrap(&mut self) -> *mut ffi::TF_Tensor {
-        tensor::unwrap(self)
+    fn into_raw(&mut self) -> *mut ffi::TF_Tensor {
+        tensor::into_raw(self)
     }
 }

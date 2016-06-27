@@ -20,6 +20,6 @@ impl Drop for Status {
 }
 
 #[inline(always)]
-pub fn raw(status: &Status) -> *mut ffi::TF_Status {
+pub fn as_raw(status: &Status) -> *mut ffi::TF_Status {
     status.raw
 }

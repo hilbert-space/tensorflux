@@ -11,15 +11,15 @@ fn main() {
     let mut session = ok!(Session::new(ok!(Options::new())));
     ok!(session.extend(&ok!(Definition::load(GRAPH_PATH)))); // c = a * b
 
-    let a = ok!(Tensor::new(vec![1f32, 2f32, 3f32], &[3]));
-    let b = ok!(Tensor::new(vec![4f32, 5f32, 6f32], &[3]));
-    let mut c = ok!(Tensor::new(vec![0f32, 0f32, 0f32], &[3]));
+    let a = ok!(Tensor::new(vec![1f32, 2.0, 3.0], &[3]));
+    let b = ok!(Tensor::new(vec![4f32, 5.0, 6.0], &[3]));
 
-    ok!(session.run(
-        vec![Input::new("a:0", a), Input::new("b:0", b)],
-        vec![Output::new("c:0", &mut c)],
-        vec![],
-    ));
+    let inputs = vec![Input::new("a:0", a), Input::new("b:0", b)];
+    let mut outputs = vec![Output::new("c:0")];
 
-    assert_eq!(&c[..], &[0f32, 0f32, 0f32]);
+    ok!(session.run(inputs, &mut outputs, vec![]));
+
+    let c: Tensor<f32> = outputs.pop().unwrap().into().unwrap();
+
+    assert_eq!(&c[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
 }

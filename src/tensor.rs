@@ -57,9 +57,13 @@ impl<T> Drop for Tensor<T> {
     }
 }
 
+pub fn from_raw<T>(_: *mut ffi::TF_Tensor) -> Result<Tensor<T>> where T: Value {
+    unreachable!();
+}
+
 #[inline(always)]
-pub fn unwrap<T>(tensor: &mut Tensor<T>) -> *mut ffi::TF_Tensor {
-    tensor.raw.take().unwrap_or_else(|| ptr::null_mut())
+pub fn into_raw<T>(tensor: &mut Tensor<T>) -> *mut ffi::TF_Tensor {
+    tensor.raw.take().unwrap()
 }
 
 unsafe extern "C" fn noop(_: *mut c_void, _: size_t, _: *mut c_void) {}
