@@ -14,11 +14,11 @@ fn main() {
     let b = ok!(Tensor::new(vec![4f32, 5.0, 6.0], vec![3]));
 
     let inputs = vec![Input::new("a", a), Input::new("b", b)];
-    let mut outputs = vec![Output::new("c")];
+    let outputs = vec![Output::new("c")];
 
-    ok!(session.run(inputs, &mut outputs, vec![]));
+    let mut results = ok!(session.run(inputs, outputs, vec![]));
 
-    let c: Tensor<f32> = outputs.pop().unwrap().into().unwrap();
+    let c: Tensor<f32> = results.pop().unwrap().into().unwrap();
 
     assert_eq!(&c[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
 }

@@ -18,21 +18,18 @@ pub struct Session {
 }
 
 /// An input.
-#[allow(dead_code)]
 pub struct Input {
     name: CString,
     tensor: Box<Flexor>,
 }
 
 /// An output.
-#[allow(dead_code)]
 pub struct Output {
     name: CString,
     tensor: Option<*mut ffi::TF_Tensor>,
 }
 
 /// A target.
-#[allow(dead_code)]
 pub struct Target {
     name: CString,
 }
@@ -60,8 +57,8 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run<'l>(&mut self, mut inputs: Vec<Input>, outputs: &mut [Output],
-                   targets: Vec<Target>) -> Result<()>
+    pub fn run<'l>(&mut self, mut inputs: Vec<Input>, mut outputs: Vec<Output>,
+                   targets: Vec<Target>) -> Result<Vec<Output>>
     {
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
@@ -94,7 +91,7 @@ impl Session {
             outputs[i].set(output_tensors[i]);
         }
 
-        Ok(())
+        Ok(outputs)
     }
 }
 
