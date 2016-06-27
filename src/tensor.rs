@@ -24,8 +24,8 @@ impl<T> Tensor<T> where T: Value {
         let raw = {
             let mut dimensions = dimensions.iter().map(|&d| d as c_longlong).collect::<Vec<_>>();
             nonnull!(ffi!(TF_NewTensor(T::kind().into(), dimensions.as_mut_ptr(),
-                                dimensions.len() as c_int, data.as_mut_ptr() as *mut _,
-                                needed as size_t, Some(noop), ptr::null_mut())))
+                                       dimensions.len() as c_int, data.as_mut_ptr() as *mut _,
+                                       needed as size_t, Some(noop), ptr::null_mut())))
         };
         Ok(Tensor { data: data, dimensions: dimensions, owned: true, raw: Some(raw) })
     }
