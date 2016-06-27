@@ -143,6 +143,15 @@ impl Output {
     }
 }
 
+impl Drop for Output {
+    #[inline]
+    fn drop(&mut self) {
+        if let Some(tensor) = self.tensor.take() {
+            ffi!(TF_DeleteTensor(tensor));
+        }
+    }
+}
+
 impl Target {
     /// Create a target.
     #[inline]
