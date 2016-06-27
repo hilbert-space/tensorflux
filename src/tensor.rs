@@ -9,22 +9,31 @@ use kind::{Type, Value};
 /// A tensor.
 pub struct Tensor<T> {
     data: Vec<T>,
-    drop: bool,
+    dimensions: Vec<usize>,
+    owned: bool,
     raw: Option<*mut ffi::TF_Tensor>,
 }
 
 impl<T> Tensor<T> where T: Value {
     /// Create a tensor.
-    pub fn new(mut data: Vec<T>, dimensions: &[usize]) -> Result<Self> {
+    pub fn new(mut data: Vec<T>, dimensions: Vec<usize>) -> Result<Self> {
         let (given, needed) = (data.len(), dimensions.iter().fold(1, |p, &d| p * d));
         if needed > given {
             raise!("there should be at least {} data point(s)", needed);
         }
-        let mut dimensions = dimensions.iter().map(|&d| d as c_longlong).collect::<Vec<_>>();
-        let raw = nonnull!(ffi!(TF_NewTensor(T::kind().into(), dimensions.as_mut_ptr(),
+        let raw = {
+            let mut dimensions = dimensions.iter().map(|&d| d as c_longlong).collect::<Vec<_>>();
+            nonnull!(ffi!(TF_NewTensor(T::kind().into(), dimensions.as_mut_ptr(),
                                 dimensions.len() as c_int, data.as_mut_ptr() as *mut _,
-                                needed as size_t, Some(noop), ptr::null_mut())));
-        Ok(Tensor { data: data, drop: true, raw: Some(raw) })
+                                needed as size_t, Some(noop), ptr::null_mut())))
+        };
+        Ok(Tensor { data: data, dimensions: dimensions, owned: true, raw: Some(raw) })
+    }
+
+    /// Return the dimensions.
+    #[inline]
+    pub fn dimensions(&self) -> &[usize] {
+        &self.dimensions
     }
 }
 
@@ -46,7 +55,7 @@ impl<T> DerefMut for Tensor<T> {
 
 impl<T> Drop for Tensor<T> {
     fn drop(&mut self) {
-        if !self.drop {
+        if !self.owned {
             mem::forget(mem::replace(&mut self.data, vec![]));
         }
         if let Some(raw) = self.raw.take() {
@@ -57,7 +66,7 @@ impl<T> Drop for Tensor<T> {
 
 impl<T> Into<Vec<T>> for Tensor<T> where T: Clone {
     fn into(mut self) -> Vec<T> {
-        if self.drop {
+        if self.owned {
             mem::replace(&mut self.data, vec![])
         } else {
             self.data.clone()
@@ -81,7 +90,7 @@ pub fn from_raw<T>(raw: *mut ffi::TF_Tensor) -> Result<Tensor<T>> where T: Value
     let pointer = nonnull!(ffi!(TF_TensorData(raw)));
     let data = unsafe { Vec::from_raw_parts(pointer as *mut _, size, size) };
 
-    Ok(Tensor { data: data, drop: false, raw: Some(raw) })
+    Ok(Tensor { data: data, dimensions: dimensions, owned: false, raw: Some(raw) })
 }
 
 #[inline(always)]
