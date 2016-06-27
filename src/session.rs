@@ -25,8 +25,9 @@ pub struct Input {
 
 /// An output.
 #[allow(dead_code)]
-pub struct Output {
+pub struct Output<'l> {
     name: CString,
+    tensor: &'l mut Flexor,
 }
 
 /// A target.
@@ -58,8 +59,8 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run(&mut self, mut inputs: Vec<Input>, outputs: Vec<Output>, targets: Vec<Target>)
-               -> Result<()>
+    pub fn run<'l>(&mut self, mut inputs: Vec<Input>, outputs: Vec<Output<'l>>,
+                   targets: Vec<Target>) -> Result<()>
     {
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
@@ -107,7 +108,9 @@ impl Drop for Session {
 impl Input {
     /// Create an input.
     #[inline]
-    pub fn new<T, U>(name: T, tensor: Tensor<U>) -> Self where T: Into<String>, U: 'static {
+    pub fn new<T, U>(name: T, tensor: Tensor<U>) -> Self
+        where T: Into<String>, U: 'static
+    {
         Input {
             name: unsafe { CString::from_vec_unchecked(name.into().into()) },
             tensor: Box::new(tensor),
@@ -115,12 +118,15 @@ impl Input {
     }
 }
 
-impl Output {
+impl<'l> Output<'l> {
     /// Create an output.
     #[inline]
-    pub fn new<T>(name: T) -> Self where T: Into<String> {
+    pub fn new<T, U>(name: T, tensor: &'l mut Tensor<U>) -> Self
+        where T: Into<String>, U: 'static
+    {
         Output {
             name: unsafe { CString::from_vec_unchecked(name.into().into()) },
+            tensor: tensor,
         }
     }
 }
