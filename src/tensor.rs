@@ -45,13 +45,22 @@ impl<T> DerefMut for Tensor<T> {
 }
 
 impl<T> Drop for Tensor<T> {
-    #[inline]
     fn drop(&mut self) {
         if !self.drop {
             mem::forget(mem::replace(&mut self.data, vec![]));
         }
         if let Some(raw) = self.raw.take() {
             ffi!(TF_DeleteTensor(raw));
+        }
+    }
+}
+
+impl<T> Into<Vec<T>> for Tensor<T> where T: Clone {
+    fn into(mut self) -> Vec<T> {
+        if self.drop {
+            mem::replace(&mut self.data, vec![])
+        } else {
+            self.data.clone()
         }
     }
 }
