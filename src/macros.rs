@@ -37,6 +37,10 @@ macro_rules! raise(
     ($message:expr) => (return Err(::Error::from($message)));
 );
 
+macro_rules! some(
+    ($option:expr) => ($option.expect("something has gone wrong"));
+);
+
 macro_rules! success(
     ($status:expr) => (
         if let Some(error) = ::Error::current($status) {

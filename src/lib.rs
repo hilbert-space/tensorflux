@@ -26,8 +26,8 @@
 //! session.extend(&Definition::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
 //!
 //! let mut inputs = vec![Input::new("a"), Input::new("b")];
-//! inputs[0].set(Tensor::new(vec![1f32, 2.0, 3.0], vec![3]).unwrap());
-//! inputs[1].set(Tensor::new(vec![4f32, 5.0, 6.0], vec![3]).unwrap());
+//! inputs[0].set(Tensor::new(vec![1f32, 2.0, 3.0], &[3]).unwrap());
+//! inputs[1].set(Tensor::new(vec![4f32, 5.0, 6.0], &[3]).unwrap());
 //!
 //! let mut outputs = vec![Output::new("c")];
 //!

@@ -11,8 +11,8 @@ fn main() {
     ok!(session.extend(&ok!(Definition::load(GRAPH_PATH)))); // c = a * b
 
     let mut inputs = vec![Input::new("a"), Input::new("b")];
-    inputs[0].set(ok!(Tensor::new(vec![1f32, 2.0, 3.0], vec![3])));
-    inputs[1].set(ok!(Tensor::new(vec![4f32, 5.0, 6.0], vec![3])));
+    inputs[0].set(ok!(Tensor::new(vec![1f32, 2.0, 3.0], &[3])));
+    inputs[1].set(ok!(Tensor::new(vec![4f32, 5.0, 6.0], &[3])));
 
     let mut outputs = vec![Output::new("c")];
 
