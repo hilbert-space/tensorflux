@@ -9,7 +9,6 @@ The package provides an interface to [TensorFlow][tensorflow].
 Create a graph in Python:
 
 ```python
-import numpy as np
 import tensorflow as tf
 
 with tf.Session() as session:
