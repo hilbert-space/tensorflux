@@ -24,7 +24,7 @@ translate! {
 }
 
 /// A value.
-pub trait Value {
+pub trait Value: 'static {
     /// Return the type.
     fn kind() -> Type;
 }

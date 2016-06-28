@@ -20,7 +20,7 @@ pub struct Session {
 /// An input.
 pub struct Input {
     name: CString,
-    tensor: Box<Flexor>,
+    tensor: Option<Box<Flexor>>,
 }
 
 /// An output.
@@ -57,15 +57,22 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run<'l>(&mut self, mut inputs: Vec<Input>, mut outputs: Vec<Output>,
-                   targets: Vec<Target>) -> Result<Vec<Output>>
+    pub fn run<'l>(&mut self, inputs: &mut [Input], outputs: &mut [Output],
+                   targets: &[Target]) -> Result<()>
     {
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
         let mut input_tensors = vec![ptr::null_mut(); ni];
+        let mut input_garbage = Vec::with_capacity(ni);
         for i in 0..ni {
             input_names[i] = inputs[i].name.as_ptr();
-            input_tensors[i] = inputs[i].tensor.into_raw();
+            match inputs[i].tensor.take() {
+                Some(mut tensor) => {
+                    input_tensors[i] = tensor.into_raw();
+                    input_garbage.push(tensor);
+                },
+                _ => raise!("some of the inputs have not been set"),
+            }
         }
 
         let no = outputs.len();
@@ -91,7 +98,7 @@ impl Session {
             outputs[i].set(output_tensors[i]);
         }
 
-        Ok(outputs)
+        Ok(())
     }
 }
 
@@ -106,13 +113,16 @@ impl Drop for Session {
 impl Input {
     /// Create an input.
     #[inline]
-    pub fn new<T, U>(name: T, tensor: Tensor<U>) -> Self
-        where T: Into<String>, U: 'static
-    {
+    pub fn new<T>(name: T) -> Self where T: Into<String> {
         Input {
             name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-            tensor: Box::new(tensor),
+            tensor: None,
         }
+    }
+
+    /// Assign a tensor.
+    pub fn set<T>(&mut self, tensor: Tensor<T>) where T: Value {
+        self.tensor = Some(Box::new(tensor));
     }
 }
 
@@ -126,8 +136,8 @@ impl Output {
         }
     }
 
-    /// Convert into a tensor.
-    pub fn into<T>(mut self) -> Result<Tensor<T>> where T: Value {
+    /// Extract the underlying tensor.
+    pub fn get<T>(&mut self) -> Result<Tensor<T>> where T: Value {
         match self.tensor.take() {
             Some(tensor) => tensor::from_raw(tensor),
             _ => raise!("the output has not been processed"),

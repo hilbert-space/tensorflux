@@ -25,17 +25,16 @@
 //! let mut session = Session::new(Options::new().unwrap()).unwrap();
 //! session.extend(&Definition::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
 //!
-//! let a = Tensor::new(vec![1f32, 2.0, 3.0], vec![3]).unwrap();
-//! let b = Tensor::new(vec![4f32, 5.0, 6.0], vec![3]).unwrap();
+//! let mut inputs = vec![Input::new("a"), Input::new("b")];
+//! inputs[0].set(Tensor::new(vec![1f32, 2.0, 3.0], vec![3]).unwrap());
+//! inputs[1].set(Tensor::new(vec![4f32, 5.0, 6.0], vec![3]).unwrap());
 //!
-//! let inputs = vec![Input::new("a", a), Input::new("b", b)];
-//! let outputs = vec![Output::new("c")];
+//! let mut outputs = vec![Output::new("c")];
 //!
-//! let mut results = session.run(inputs, outputs, vec![]).unwrap();
+//! session.run(&mut inputs, &mut outputs, &vec![]).unwrap();
 //!
-//! let c: Tensor<f32> = results.pop().unwrap().into().unwrap();
-//!
-//! assert_eq!(&c[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
+//! let result = outputs[0].get::<f32>().unwrap();
+//! assert_eq!(&result[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
 //! ```
 
 extern crate libc;
