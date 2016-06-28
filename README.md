@@ -6,11 +6,26 @@ The package provides an interface to [TensorFlow][tensorflow].
 
 ## [Example][example]
 
+Create a graph in Python:
+
+```python
+import numpy as np
+import tensorflow as tf
+
+with tf.Session() as session:
+    a = tf.Variable(0.0, name='a')
+    b = tf.Variable(0.0, name='b')
+    c = tf.mul(a, b, name='c')
+    tf.train.write_graph(session.graph_def, '', 'graph.pb', as_text=False)
+```
+
+Evaluate the graph in Rust:
+
 ```rust
 use tensorflux::{Definition, Input, Options, Output, Session, Tensor};
 
 let mut session = Session::new(Options::new().unwrap()).unwrap();
-session.extend(&Definition::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
+session.extend(&Definition::load("graph.pb").unwrap()).unwrap(); // c = a * b
 
 let a = Tensor::new(vec![1f32, 2.0, 3.0], vec![3]).unwrap();
 let b = Tensor::new(vec![4f32, 5.0, 6.0], vec![3]).unwrap();
