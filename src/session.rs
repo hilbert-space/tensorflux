@@ -11,8 +11,6 @@ use tensor::{self, Tensor};
 
 /// A session.
 pub struct Session {
-    #[allow(dead_code)]
-    options: Options,
     status: Status,
     raw: *mut ffi::TF_Session,
 }
@@ -40,11 +38,11 @@ trait Flexor {
 
 impl Session {
     /// Create a session.
-    pub fn new(options: Options) -> Result<Self> {
+    pub fn new(options: &Options) -> Result<Self> {
         let status = try!(Status::new());
-        let raw = nonnull!(ffi!(TF_NewSession(options::as_raw(&options), status::as_raw(&status))),
+        let raw = nonnull!(ffi!(TF_NewSession(options::as_raw(options), status::as_raw(&status))),
                            &status);
-        Ok(Session { options: options, status: status, raw: raw })
+        Ok(Session { status: status, raw: raw })
     }
 
     /// Extend the graph.
