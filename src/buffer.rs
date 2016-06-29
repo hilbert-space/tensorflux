@@ -5,22 +5,22 @@ use std::path::Path;
 
 use Result;
 
-/// A definition.
-pub struct Definition {
+/// A buffer.
+pub struct Buffer {
     data: Vec<u8>,
 }
 
-impl Definition {
-    /// Load a definition.
+impl Buffer {
+    /// Load a buffer.
     pub fn load<T: AsRef<Path>>(path: T) -> Result<Self> {
         let mut data = vec![];
         let mut file = ok!(File::open(path));
         ok!(file.read_to_end(&mut data));
-        Ok(Definition { data: data })
+        Ok(Buffer { data: data })
     }
 }
 
-impl AsRef<[u8]> for Definition {
+impl AsRef<[u8]> for Buffer {
     #[inline]
     fn as_ref(&self) -> &[u8] {
         &self.data
