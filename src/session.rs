@@ -46,6 +46,13 @@ impl Session {
     }
 
     /// Extend the graph using a protocol buffer.
+    ///
+    /// The schema of the protocol buffer is called GraphDef, and it can be
+    /// found in TensorFlow’s [repository][1]. An example of creating a graph
+    /// definition is given in the [main description][2] of this package.
+    ///
+    /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/graph.proto
+    /// [2]: index.html#example
     pub fn extend<T>(&mut self, buffer: T) -> Result<()> where T: AsRef<[u8]> {
         let buffer = buffer.as_ref();
         ok!(ffi!(TF_ExtendGraph(self.raw, buffer.as_ptr() as *const _, buffer.len() as size_t,
