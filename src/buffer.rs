@@ -17,13 +17,7 @@ pub struct Buffer {
 
 impl Buffer {
     /// Create a buffer.
-    #[inline]
-    pub fn new() -> Result<Self> {
-        Buffer::from(vec![])
-    }
-
-    /// Create a buffer from a vector.
-    pub fn from(data: Vec<u8>) -> Result<Self> {
+    pub fn new(data: Vec<u8>) -> Result<Self> {
         let raw = ffi!(TF_NewBuffer());
         unsafe {
             (*raw).data = data.as_ptr() as *mut _;
@@ -38,7 +32,7 @@ impl Buffer {
         let mut data = vec![];
         let mut file = ok!(File::open(path));
         ok!(file.read_to_end(&mut data));
-        Buffer::from(data)
+        Buffer::new(data)
     }
 }
 

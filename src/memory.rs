@@ -12,7 +12,7 @@ impl<T> Memory<T> {
         Memory { data: data, owned: true }
     }
 
-    pub fn empty(&mut self) -> Vec<T> where T: Clone {
+    pub fn drain(&mut self) -> Vec<T> where T: Clone {
         if self.owned {
             return mem::replace(&mut self.data, vec![])
         } else {
@@ -51,6 +51,6 @@ impl<T> Drop for Memory<T> {
 impl<T> Into<Vec<T>> for Memory<T> where T: Clone {
     #[inline]
     fn into(mut self) -> Vec<T> {
-        self.empty()
+        self.drain()
     }
 }

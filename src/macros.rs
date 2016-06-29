@@ -57,7 +57,7 @@ macro_rules! memory {
         impl<T> Into<Vec<T>> for $kind<T> where T: Clone {
             #[inline]
             fn into(mut self) -> Vec<T> {
-                self.memory.empty()
+                self.memory.drain()
             }
         }
     );
@@ -74,7 +74,7 @@ macro_rules! memory {
         impl Into<Vec<$element>> for $kind {
             #[inline]
             fn into(mut self) -> Vec<$element> {
-                self.memory.empty()
+                self.memory.drain()
             }
         }
     );
