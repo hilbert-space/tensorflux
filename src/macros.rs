@@ -2,6 +2,10 @@ macro_rules! ffi(
     ($function:ident($($argument:expr),*)) => (unsafe { ::ffi::$function($($argument),*) });
 );
 
+macro_rules! into_cstring(
+    ($string:expr) => (unsafe { ::std::ffi::CString::from_vec_unchecked($string.into().into()) });
+);
+
 macro_rules! nonnull(
     ($pointer:expr, $status:expr) => ({
         let pointer = $pointer;

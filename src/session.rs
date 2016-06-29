@@ -112,10 +112,7 @@ impl Input {
     /// Create an input.
     #[inline]
     pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Input {
-            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-            tensor: None,
-        }
+        Input { name: into_cstring!(name), tensor: None }
     }
 
     /// Assign a tensor.
@@ -128,10 +125,7 @@ impl Output {
     /// Create an output.
     #[inline]
     pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Output {
-            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-            tensor: None,
-        }
+        Output { name: into_cstring!(name), tensor: None }
     }
 
     /// Extract the tensor.
@@ -163,9 +157,7 @@ impl Target {
     /// Create a target.
     #[inline]
     pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Target {
-            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-        }
+        Target { name: into_cstring!(name) }
     }
 }
 

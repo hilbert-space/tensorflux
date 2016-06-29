@@ -1,5 +1,7 @@
 use ffi;
 use libc::size_t;
+use std::ffi::CString;
+use std::mem;
 
 use Result;
 use status::{self, Status};
@@ -7,6 +9,7 @@ use status::{self, Status};
 /// Options.
 pub struct Options {
     status: Status,
+    target: Option<CString>,
     raw: *mut ffi::TF_SessionOptions,
 }
 
@@ -15,6 +18,7 @@ impl Options {
     pub fn new() -> Result<Self> {
         Ok(Options {
             status: try!(Status::new()),
+            target: None,
             raw: nonnull!(ffi!(TF_NewSessionOptions())),
         })
     }
@@ -26,6 +30,13 @@ impl Options {
                               status::as_raw(&self.status))),
             &self.status);
         Ok(())
+    }
+
+    /// Set the target.
+    pub fn target<T>(&mut self, target: T) where T: Into<String> {
+        let target = into_cstring!(target);
+        ffi!(TF_SetTarget(self.raw, target.as_ptr()));
+        mem::replace(&mut self.target, Some(target));
     }
 }
 
