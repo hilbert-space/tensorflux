@@ -19,14 +19,14 @@ impl<T> Memory<T> {
     }
 }
 
+deref!(Memory::data<T>);
+
 impl<T> AsRef<[T]> for Memory<T> {
     #[inline]
     fn as_ref(&self) -> &[T] {
         &self.data
     }
 }
-
-deref!(Memory::data);
 
 impl<T> Drop for Memory<T> {
     #[inline]

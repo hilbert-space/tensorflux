@@ -32,7 +32,7 @@ impl<T> Tensor<T> where T: Value {
     }
 }
 
-deref!(Tensor::memory);
+deref!(Tensor::memory<T>);
 
 impl<T> Drop for Tensor<T> {
     fn drop(&mut self) {

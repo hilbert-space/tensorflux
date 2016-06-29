@@ -1,5 +1,5 @@
 macro_rules! deref {
-    ($kind:ident::$field:ident) => {
+    ($kind:ident::$field:ident<T>) => (
         impl<T> ::std::ops::Deref for $kind<T> {
             type Target = [T];
 
@@ -15,7 +15,24 @@ macro_rules! deref {
                 &mut self.$field
             }
         }
-    }
+    );
+    ($kind:ident::$field:ident<$element:ident>) => (
+        impl ::std::ops::Deref for $kind {
+            type Target = [$element];
+
+            #[inline]
+            fn deref(&self) -> &[$element] {
+                &self.$field
+            }
+        }
+
+        impl ::std::ops::DerefMut for $kind {
+            #[inline]
+            fn deref_mut(&mut self) -> &mut [$element] {
+                &mut self.$field
+            }
+        }
+    );
 }
 
 macro_rules! ffi(
@@ -59,10 +76,6 @@ macro_rules! ok(
 macro_rules! raise(
     ($template:expr, $($argument:tt)*) => (raise!(format!($template, $($argument)*)));
     ($message:expr) => (return Err(::Error::from($message)));
-);
-
-macro_rules! some(
-    ($option:expr) => ($option.expect("something has gone wrong"));
 );
 
 macro_rules! success(
