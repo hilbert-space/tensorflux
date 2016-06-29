@@ -11,8 +11,6 @@ use tensor::{self, Tensor};
 
 /// A session.
 pub struct Session {
-    #[allow(dead_code)]
-    options: Options,
     status: Status,
     raw: *mut ffi::TF_Session,
 }
@@ -40,17 +38,17 @@ trait Flexor {
 
 impl Session {
     /// Create a session.
-    pub fn new(options: Options) -> Result<Self> {
+    pub fn new(options: &Options) -> Result<Self> {
         let status = try!(Status::new());
-        let raw = nonnull!(ffi!(TF_NewSession(options::as_raw(&options), status::as_raw(&status))),
+        let raw = nonnull!(ffi!(TF_NewSession(options::as_raw(options), status::as_raw(&status))),
                            &status);
-        Ok(Session { options: options, status: status, raw: raw })
+        Ok(Session { status: status, raw: raw })
     }
 
-    /// Extend the graph.
-    pub fn extend<T>(&mut self, definition: T) -> Result<()> where T: AsRef<[u8]> {
-        let data = definition.as_ref();
-        ok!(ffi!(TF_ExtendGraph(self.raw, data.as_ptr() as *const _, data.len() as size_t,
+    /// Extend the graph using a protocol buffer.
+    pub fn extend<T>(&mut self, buffer: T) -> Result<()> where T: AsRef<[u8]> {
+        let buffer = buffer.as_ref();
+        ok!(ffi!(TF_ExtendGraph(self.raw, buffer.as_ptr() as *const _, buffer.len() as size_t,
                                 status::as_raw(&self.status))),
             &self.status);
         Ok(())
@@ -114,10 +112,7 @@ impl Input {
     /// Create an input.
     #[inline]
     pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Input {
-            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-            tensor: None,
-        }
+        Input { name: into_cstring!(name), tensor: None }
     }
 
     /// Assign a tensor.
@@ -130,13 +125,10 @@ impl Output {
     /// Create an output.
     #[inline]
     pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Output {
-            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-            tensor: None,
-        }
+        Output { name: into_cstring!(name), tensor: None }
     }
 
-    /// Extract the underlying tensor.
+    /// Extract the tensor.
     pub fn get<T>(&mut self) -> Result<Tensor<T>> where T: Value {
         match self.tensor.take() {
             Some(tensor) => tensor::from_raw(tensor),
@@ -165,9 +157,7 @@ impl Target {
     /// Create a target.
     #[inline]
     pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Target {
-            name: unsafe { CString::from_vec_unchecked(name.into().into()) },
-        }
+        Target { name: into_cstring!(name) }
     }
 }
 

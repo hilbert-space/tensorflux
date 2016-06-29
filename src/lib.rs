@@ -22,7 +22,7 @@
 //! # const GRAPH_PATH: &'static str = "examples/fixtures/graph.pb";
 //! use tensorflux::{Definition, Input, Options, Output, Session, Tensor};
 //!
-//! let mut session = Session::new(Options::new().unwrap()).unwrap();
+//! let mut session = Session::new(&Options::new().unwrap()).unwrap();
 //! session.extend(&Definition::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
 //!
 //! let mut inputs = vec![Input::new("a"), Input::new("b")];
