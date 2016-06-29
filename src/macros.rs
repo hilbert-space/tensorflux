@@ -43,6 +43,43 @@ macro_rules! into_cstring(
     ($string:expr) => (unsafe { ::std::ffi::CString::from_vec_unchecked($string.into().into()) });
 );
 
+macro_rules! memory {
+    ($kind:ident<T>) => (
+        deref!($kind::memory<T>);
+
+        impl<T> ::std::convert::AsRef<[T]> for $kind<T> {
+            #[inline]
+            fn as_ref(&self) -> &[T] {
+                &self.memory
+            }
+        }
+
+        impl<T> Into<Vec<T>> for $kind<T> where T: Clone {
+            #[inline]
+            fn into(mut self) -> Vec<T> {
+                self.memory.empty()
+            }
+        }
+    );
+    ($kind:ident<$element:ident>) => (
+        deref!($kind::memory<$element>);
+
+        impl ::std::convert::AsRef<[$element]> for $kind {
+            #[inline]
+            fn as_ref(&self) -> &[$element] {
+                &self.memory
+            }
+        }
+
+        impl Into<Vec<$element>> for $kind {
+            #[inline]
+            fn into(mut self) -> Vec<$element> {
+                self.memory.empty()
+            }
+        }
+    );
+}
+
 macro_rules! nonnull(
     ($pointer:expr, $status:expr) => ({
         let pointer = $pointer;

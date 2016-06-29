@@ -1,7 +1,6 @@
 use ffi;
 use libc::size_t;
 
-use std::convert::AsRef;
 use std::fs::File;
 use std::io::Read;
 use std::mem;
@@ -43,26 +42,12 @@ impl Buffer {
     }
 }
 
-deref!(Buffer::memory<u8>);
-
-impl AsRef<[u8]> for Buffer {
-    #[inline]
-    fn as_ref(&self) -> &[u8] {
-        &self.memory
-    }
-}
+memory!(Buffer<u8>);
 
 impl Drop for Buffer {
     #[inline]
     fn drop(&mut self) {
         ffi!(TF_DeleteBuffer(self.raw));
-    }
-}
-
-impl Into<Vec<u8>> for Buffer {
-    #[inline]
-    fn into(mut self) -> Vec<u8> {
-        self.memory.empty()
     }
 }
 

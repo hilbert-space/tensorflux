@@ -32,20 +32,13 @@ impl<T> Tensor<T> where T: Value {
     }
 }
 
-deref!(Tensor::memory<T>);
+memory!(Tensor<T>);
 
 impl<T> Drop for Tensor<T> {
     fn drop(&mut self) {
         if !self.raw.is_null() {
             ffi!(TF_DeleteTensor(self.raw));
         }
-    }
-}
-
-impl<T> Into<Vec<T>> for Tensor<T> where T: Clone {
-    #[inline]
-    fn into(mut self) -> Vec<T> {
-        self.memory.empty()
     }
 }
 
