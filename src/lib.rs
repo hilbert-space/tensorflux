@@ -46,6 +46,7 @@ mod macros;
 mod buffer;
 mod error;
 mod kind;
+mod memory;
 mod options;
 mod session;
 mod status;

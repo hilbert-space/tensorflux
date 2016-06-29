@@ -1,3 +1,23 @@
+macro_rules! deref {
+    ($kind:ident::$field:ident) => {
+        impl<T> ::std::ops::Deref for $kind<T> {
+            type Target = [T];
+
+            #[inline]
+            fn deref(&self) -> &[T] {
+                &self.$field
+            }
+        }
+
+        impl<T> ::std::ops::DerefMut for $kind<T> {
+            #[inline]
+            fn deref_mut(&mut self) -> &mut [T] {
+                &mut self.$field
+            }
+        }
+    }
+}
+
 macro_rules! ffi(
     ($function:ident($($argument:expr),*)) => (unsafe { ::ffi::$function($($argument),*) });
 );
