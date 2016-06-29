@@ -45,10 +45,10 @@ impl Session {
         Ok(Session { status: status, raw: raw })
     }
 
-    /// Extend the graph.
-    pub fn extend<T>(&mut self, definition: T) -> Result<()> where T: AsRef<[u8]> {
-        let data = definition.as_ref();
-        ok!(ffi!(TF_ExtendGraph(self.raw, data.as_ptr() as *const _, data.len() as size_t,
+    /// Extend the graph using a protocol buffer.
+    pub fn extend<T>(&mut self, buffer: T) -> Result<()> where T: AsRef<[u8]> {
+        let buffer = buffer.as_ref();
+        ok!(ffi!(TF_ExtendGraph(self.raw, buffer.as_ptr() as *const _, buffer.len() as size_t,
                                 status::as_raw(&self.status))),
             &self.status);
         Ok(())
@@ -134,7 +134,7 @@ impl Output {
         }
     }
 
-    /// Extract the underlying tensor.
+    /// Extract the tensor.
     pub fn get<T>(&mut self) -> Result<Tensor<T>> where T: Value {
         match self.tensor.take() {
             Some(tensor) => tensor::from_raw(tensor),
