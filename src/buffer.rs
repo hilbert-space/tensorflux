@@ -4,6 +4,7 @@ use libc::size_t;
 use std::convert::AsRef;
 use std::fs::File;
 use std::io::Read;
+use std::mem;
 use std::path::Path;
 
 use Result;
@@ -63,4 +64,15 @@ impl Into<Vec<u8>> for Buffer {
     fn into(mut self) -> Vec<u8> {
         self.memory.empty()
     }
+}
+
+#[inline(always)]
+pub fn as_raw(buffer: &Buffer) -> *mut ffi::TF_Buffer {
+    buffer.raw
+}
+
+pub fn reset(buffer: &mut Buffer) {
+    let (pointer, length) = unsafe { ((*buffer.raw).data, (*buffer.raw).length) };
+    let mut memory = Memory::from_raw(pointer as *mut _, length as usize);
+    mem::swap(&mut buffer.memory, &mut memory);
 }

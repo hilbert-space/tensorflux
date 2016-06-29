@@ -4,6 +4,7 @@ use std::ffi::CString;
 use std::{mem, ptr};
 
 use Result;
+use buffer::{self, Buffer};
 use kind::Value;
 use options::{self, Options};
 use status::{self, Status};
@@ -57,7 +58,9 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output]) -> Result<()> {
+    pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output],
+               options: Option<&Buffer>, metadata: Option<&mut Buffer>) -> Result<()> {
+
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
         let mut input_tensors = vec![ptr::null_mut(); ni];
@@ -82,14 +85,30 @@ impl Session {
 
         let mut target_names = vec![];
 
-        ok!(ffi!(TF_Run(self.raw, ptr::null(), input_names.as_mut_ptr(),
+        let options_buffer = if let Some(buffer) = options {
+            buffer::as_raw(buffer)
+        } else {
+            ptr::null_mut()
+        };
+
+        let metadata_buffer = if let Some(ref buffer) = metadata {
+            buffer::as_raw(buffer)
+        } else {
+            ptr::null_mut()
+        };
+
+        ok!(ffi!(TF_Run(self.raw, options_buffer, input_names.as_mut_ptr(),
                         input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
-                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
-                        0, ptr::null_mut(), status::as_raw(&self.status))),
+                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(), 0,
+                        metadata_buffer, status::as_raw(&self.status))),
             &self.status);
 
         for i in 0..no {
             outputs[i].set(output_tensors[i]);
+        }
+
+        if let Some(buffer) = metadata {
+            buffer::reset(buffer);
         }
 
         Ok(())
