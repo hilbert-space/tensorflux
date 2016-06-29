@@ -4,6 +4,7 @@ use std::ffi::CString;
 use std::mem;
 
 use Result;
+use buffer::Buffer;
 use status::{self, Status};
 
 /// Options.
@@ -29,7 +30,7 @@ impl Options {
     /// `ConfigProto`, and it can be found in TensorFlow’s [repository][1].
     ///
     /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
-    pub fn configure<T>(&mut self, configuration: T) -> Result<()> where T: AsRef<[u8]> {
+    pub fn configure(&mut self, configuration: &Buffer) -> Result<()> {
         let configuration = configuration.as_ref();
         ok!(ffi!(TF_SetConfig(self.raw, configuration.as_ptr() as *const _,
                               configuration.len() as size_t, status::as_raw(&self.status))),
