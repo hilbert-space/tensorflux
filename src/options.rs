@@ -24,6 +24,11 @@ impl Options {
     }
 
     /// Configure using a protocol buffer.
+    ///
+    /// The scheme of the protocol buffer is called ConfigProto, and it can be
+    /// found in TensorFlow’s [repository][1].
+    ///
+    /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
     pub fn configure<T>(&mut self, buffer: T) -> Result<()> where T: AsRef<[u8]> {
         let buffer = buffer.as_ref();
         ok!(ffi!(TF_SetConfig(self.raw, buffer.as_ptr() as *const _, buffer.len() as size_t,
