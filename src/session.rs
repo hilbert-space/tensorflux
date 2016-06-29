@@ -50,7 +50,7 @@ impl Session {
     ///
     /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/graph.proto
     /// [2]: index.html#example
-    pub fn extend<T>(&mut self, definition: T) -> Result<()> where T: AsRef<[u8]> {
+    pub fn extend(&mut self, definition: &Buffer) -> Result<()> {
         let definition = definition.as_ref();
         ok!(ffi!(TF_ExtendGraph(self.raw, definition.as_ptr() as *const _,
                                 definition.len() as size_t, status::as_raw(&self.status))),
