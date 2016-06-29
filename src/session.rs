@@ -57,7 +57,7 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run<'l>(&mut self, inputs: &mut [Input], outputs: &mut [Output]) -> Result<()> {
+    pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output]) -> Result<()> {
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
         let mut input_tensors = vec![ptr::null_mut(); ni];
