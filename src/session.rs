@@ -27,11 +27,6 @@ pub struct Output {
     tensor: Option<*mut ffi::TF_Tensor>,
 }
 
-/// A target.
-pub struct Target {
-    name: CString,
-}
-
 trait Flexor {
     fn into_raw(&mut self) -> *mut ffi::TF_Tensor;
 }
@@ -62,9 +57,7 @@ impl Session {
     }
 
     /// Run the graph.
-    pub fn run<'l>(&mut self, inputs: &mut [Input], outputs: &mut [Output],
-                   targets: &[Target]) -> Result<()>
-    {
+    pub fn run<'l>(&mut self, inputs: &mut [Input], outputs: &mut [Output]) -> Result<()> {
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
         let mut input_tensors = vec![ptr::null_mut(); ni];
@@ -87,16 +80,12 @@ impl Session {
             output_names[i] = outputs[i].name.as_ptr();
         }
 
-        let nt = targets.len();
-        let mut target_names = vec![ptr::null(); nt];
-        for i in 0..nt {
-            target_names[i] = targets[i].name.as_ptr();
-        }
+        let mut target_names = vec![];
 
         ok!(ffi!(TF_Run(self.raw, ptr::null(), input_names.as_mut_ptr(),
                         input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
                         output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
-                        nt as c_int, ptr::null_mut(), status::as_raw(&self.status))),
+                        0, ptr::null_mut(), status::as_raw(&self.status))),
             &self.status);
 
         for i in 0..no {
@@ -157,14 +146,6 @@ impl Drop for Output {
         if let Some(tensor) = self.tensor.take() {
             ffi!(TF_DeleteTensor(tensor));
         }
-    }
-}
-
-impl Target {
-    /// Create a target.
-    #[inline]
-    pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Target { name: into_cstring!(name) }
     }
 }
 
