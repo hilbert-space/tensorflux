@@ -23,7 +23,7 @@ impl Buffer {
     }
 
     /// Create a buffer from a vector.
-    fn from(data: Vec<u8>) -> Result<Self> {
+    pub fn from(data: Vec<u8>) -> Result<Self> {
         let raw = ffi!(TF_NewBuffer());
         unsafe {
             (*raw).data = data.as_ptr() as *mut _;
