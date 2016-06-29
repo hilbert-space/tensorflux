@@ -43,21 +43,28 @@ impl Session {
 
     /// Extend the graph using a protocol buffer.
     ///
-    /// The schema of the protocol buffer is called GraphDef, and it can be
-    /// found in TensorFlow’s [repository][1]. An example of creating a graph
-    /// definition is given in the [main description][2] of this package.
+    /// The schema of the `definition` protocol buffer is called `GraphDef`, and
+    /// it can be found in TensorFlow’s [repository][1]. An example of creating
+    /// a graph definition is given in the [main description][2] of this
+    /// package.
     ///
     /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/graph.proto
     /// [2]: index.html#example
-    pub fn extend<T>(&mut self, buffer: T) -> Result<()> where T: AsRef<[u8]> {
-        let buffer = buffer.as_ref();
-        ok!(ffi!(TF_ExtendGraph(self.raw, buffer.as_ptr() as *const _, buffer.len() as size_t,
-                                status::as_raw(&self.status))),
+    pub fn extend<T>(&mut self, definition: T) -> Result<()> where T: AsRef<[u8]> {
+        let definition = definition.as_ref();
+        ok!(ffi!(TF_ExtendGraph(self.raw, definition.as_ptr() as *const _,
+                                definition.len() as size_t, status::as_raw(&self.status))),
             &self.status);
         Ok(())
     }
 
     /// Run the graph.
+    ///
+    /// The schemas of the `options` and `metadata` protocol buffers are called
+    /// `RunOptions` and `RunMetadata`, respectively, and they can be found in
+    /// TensorFlow’s [repository][1].
+    ///
+    /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
     pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output],
                options: Option<&Buffer>, metadata: Option<&mut Buffer>) -> Result<()> {
 
