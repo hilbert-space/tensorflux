@@ -32,7 +32,7 @@ inputs[1].set(Tensor::new(vec![4f32, 5.0, 6.0], &[3]).unwrap());
 
 let mut outputs = vec![Output::new("c")];
 
-session.run(&mut inputs, &mut outputs, &[]).unwrap();
+session.run(&mut inputs, &mut outputs, None, None).unwrap();
 
 let result = outputs[0].get::<f32>().unwrap();
 assert_eq!(&result[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);

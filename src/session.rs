@@ -4,6 +4,7 @@ use std::ffi::CString;
 use std::{mem, ptr};
 
 use Result;
+use buffer::{self, Buffer};
 use kind::Value;
 use options::{self, Options};
 use status::{self, Status};
@@ -27,11 +28,6 @@ pub struct Output {
     tensor: Option<*mut ffi::TF_Tensor>,
 }
 
-/// A target.
-pub struct Target {
-    name: CString,
-}
-
 trait Flexor {
     fn into_raw(&mut self) -> *mut ffi::TF_Tensor;
 }
@@ -47,24 +43,31 @@ impl Session {
 
     /// Extend the graph using a protocol buffer.
     ///
-    /// The schema of the protocol buffer is called GraphDef, and it can be
-    /// found in TensorFlow’s [repository][1]. An example of creating a graph
-    /// definition is given in the [main description][2] of this package.
+    /// The schema of the `definition` protocol buffer is called `GraphDef`, and
+    /// it can be found in TensorFlow’s [repository][1]. An example of creating
+    /// a graph definition is given in the [main description][2] of this
+    /// package.
     ///
     /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/graph.proto
     /// [2]: index.html#example
-    pub fn extend<T>(&mut self, buffer: T) -> Result<()> where T: AsRef<[u8]> {
-        let buffer = buffer.as_ref();
-        ok!(ffi!(TF_ExtendGraph(self.raw, buffer.as_ptr() as *const _, buffer.len() as size_t,
-                                status::as_raw(&self.status))),
+    pub fn extend<T>(&mut self, definition: T) -> Result<()> where T: AsRef<[u8]> {
+        let definition = definition.as_ref();
+        ok!(ffi!(TF_ExtendGraph(self.raw, definition.as_ptr() as *const _,
+                                definition.len() as size_t, status::as_raw(&self.status))),
             &self.status);
         Ok(())
     }
 
     /// Run the graph.
-    pub fn run<'l>(&mut self, inputs: &mut [Input], outputs: &mut [Output],
-                   targets: &[Target]) -> Result<()>
-    {
+    ///
+    /// The schemas of the `options` and `metadata` protocol buffers are called
+    /// `RunOptions` and `RunMetadata`, respectively, and they can be found in
+    /// TensorFlow’s [repository][1].
+    ///
+    /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
+    pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output],
+               options: Option<&Buffer>, metadata: Option<&mut Buffer>) -> Result<()> {
+
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
         let mut input_tensors = vec![ptr::null_mut(); ni];
@@ -87,20 +90,32 @@ impl Session {
             output_names[i] = outputs[i].name.as_ptr();
         }
 
-        let nt = targets.len();
-        let mut target_names = vec![ptr::null(); nt];
-        for i in 0..nt {
-            target_names[i] = targets[i].name.as_ptr();
-        }
+        let mut target_names = vec![];
 
-        ok!(ffi!(TF_Run(self.raw, ptr::null(), input_names.as_mut_ptr(),
+        let options_buffer = if let Some(buffer) = options {
+            buffer::as_raw(buffer)
+        } else {
+            ptr::null_mut()
+        };
+
+        let metadata_buffer = if let Some(ref buffer) = metadata {
+            buffer::as_raw(buffer)
+        } else {
+            ptr::null_mut()
+        };
+
+        ok!(ffi!(TF_Run(self.raw, options_buffer, input_names.as_mut_ptr(),
                         input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
-                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
-                        nt as c_int, ptr::null_mut(), status::as_raw(&self.status))),
+                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(), 0,
+                        metadata_buffer, status::as_raw(&self.status))),
             &self.status);
 
         for i in 0..no {
             outputs[i].set(output_tensors[i]);
+        }
+
+        if let Some(buffer) = metadata {
+            buffer::reset(buffer);
         }
 
         Ok(())
@@ -157,14 +172,6 @@ impl Drop for Output {
         if let Some(tensor) = self.tensor.take() {
             ffi!(TF_DeleteTensor(tensor));
         }
-    }
-}
-
-impl Target {
-    /// Create a target.
-    #[inline]
-    pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Target { name: into_cstring!(name) }
     }
 }
 
