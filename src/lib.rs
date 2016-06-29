@@ -20,10 +20,10 @@
 //!
 //! ```
 //! # const GRAPH_PATH: &'static str = "examples/fixtures/graph.pb";
-//! use tensorflux::{Definition, Input, Options, Output, Session, Tensor};
+//! use tensorflux::{Buffer, Input, Options, Output, Session, Tensor};
 //!
 //! let mut session = Session::new(&Options::new().unwrap()).unwrap();
-//! session.extend(&Definition::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
+//! session.extend(&Buffer::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
 //!
 //! let mut inputs = vec![Input::new("a"), Input::new("b")];
 //! inputs[0].set(Tensor::new(vec![1f32, 2.0, 3.0], &[3]).unwrap());
@@ -43,7 +43,7 @@ extern crate tensorflow_sys as ffi;
 #[macro_use]
 mod macros;
 
-mod definition;
+mod buffer;
 mod error;
 mod kind;
 mod options;
@@ -51,7 +51,7 @@ mod session;
 mod status;
 mod tensor;
 
-pub use definition::Definition;
+pub use buffer::Buffer;
 pub use error::Error;
 pub use kind::{Type, Value};
 pub use options::Options;
