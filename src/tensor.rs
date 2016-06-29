@@ -42,6 +42,13 @@ impl<T> Drop for Tensor<T> {
     }
 }
 
+impl<T> Into<Vec<T>> for Tensor<T> where T: Clone {
+    #[inline]
+    fn into(mut self) -> Vec<T> {
+        self.memory.empty()
+    }
+}
+
 pub fn from_raw<T>(raw: *mut ffi::TF_Tensor) -> Result<Tensor<T>> where T: Value {
     if Type::from(ffi!(TF_TensorType(raw))) != T::kind() {
         raise!("the data types do not match");

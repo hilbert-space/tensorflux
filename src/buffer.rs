@@ -57,3 +57,10 @@ impl Drop for Buffer {
         ffi!(TF_DeleteBuffer(self.raw));
     }
 }
+
+impl Into<Vec<u8>> for Buffer {
+    #[inline]
+    fn into(mut self) -> Vec<u8> {
+        self.memory.empty()
+    }
+}

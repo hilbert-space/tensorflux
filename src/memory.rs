@@ -12,6 +12,17 @@ impl<T> Memory<T> {
         Memory { data: data, owned: true }
     }
 
+    pub fn empty(&mut self) -> Vec<T> where T: Clone {
+        if self.owned {
+            return mem::replace(&mut self.data, vec![])
+        } else {
+            let data = self.data.clone();
+            mem::forget(mem::replace(&mut self.data, vec![]));
+            self.owned = true;
+            data
+        }
+    }
+
     #[inline]
     pub fn from_raw(pointer: *mut T, length: usize) -> Self {
         let data = unsafe { Vec::from_raw_parts(pointer, length, length) };
@@ -38,11 +49,8 @@ impl<T> Drop for Memory<T> {
 }
 
 impl<T> Into<Vec<T>> for Memory<T> where T: Clone {
+    #[inline]
     fn into(mut self) -> Vec<T> {
-        if self.owned {
-            mem::replace(&mut self.data, vec![])
-        } else {
-            self.data.clone()
-        }
+        self.empty()
     }
 }
