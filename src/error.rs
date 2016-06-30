@@ -52,8 +52,9 @@ impl Error {
 }
 
 impl fmt::Display for Error {
+    #[inline]
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        write!(formatter, "{}", &self.message)
+        self.message.fmt(formatter)
     }
 }
 
