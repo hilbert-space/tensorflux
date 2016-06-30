@@ -10,9 +10,11 @@ install:
 
 script:
   - cargo test -vv -j 1
+  - cargo test -vv -j 1 --features=complex
   - cargo run --example=workflow
 
 after_success:
+  - export CARGO_FLAGS="--features=complex"
   - curl https://stainless-steel.github.io/travis/documentation.sh | bash
 
 env:

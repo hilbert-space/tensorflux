@@ -30,7 +30,7 @@ pub trait Value: 'static {
 }
 
 macro_rules! implement {
-    ($($native:ident => $variant:ident,)*) => {
+    ($($native:path => $variant:ident,)*) => {
         $(impl Value for $native {
             #[inline]
             fn kind() -> Type {
@@ -51,4 +51,10 @@ implement! {
     u8 => UInt8,
     u16 => UInt16,
     String => String,
+}
+
+#[cfg(feature = "complex")]
+implement! {
+    ::c32 => Complex64,
+    ::c64 => Complex128,
 }

@@ -40,6 +40,9 @@
 extern crate libc;
 extern crate tensorflow_sys as ffi;
 
+#[cfg(feature = "complex")]
+extern crate num_complex as num;
+
 #[macro_use]
 mod macros;
 
@@ -61,3 +64,13 @@ pub use tensor::Tensor;
 
 /// A result.
 pub type Result<T> = std::result::Result<T, Error>;
+
+/// A complex number with 32-bit parts.
+#[cfg(feature = "complex")]
+#[allow(non_camel_case_types)]
+pub type c32 = num::Complex<f32>;
+
+/// A complex number with 64-bit parts.
+#[cfg(feature = "complex")]
+#[allow(non_camel_case_types)]
+pub type c64 = num::Complex<f64>;
