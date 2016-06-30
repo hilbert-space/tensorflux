@@ -1,6 +1,6 @@
 [package]
 name = "tensorflux"
-version = "0.4.0"
+version = "0.4.1"
 license = "Apache-2.0/MIT"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 description = "The package provides an interface to TensorFlow."
@@ -8,6 +8,10 @@ documentation = "https://stainless-steel.github.io/tensorflux"
 homepage = "https://github.com/stainless-steel/tensorflux"
 repository = "https://github.com/stainless-steel/tensorflux"
 
+[features]
+complex = ["num-complex"]
+
 [dependencies]
 libc = "0.2"
+num-complex = { version = "0.1", default-features = false, optional = true }
 tensorflow-sys = "0.3"
