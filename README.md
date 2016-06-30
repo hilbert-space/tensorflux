@@ -23,8 +23,9 @@ Evaluate the graph in Rust:
 ```rust
 use tensorflux::{Buffer, Input, Options, Output, Session, Tensor};
 
+let graph = "graph.pb"; // c = a * b
 let mut session = Session::new(&Options::new().unwrap()).unwrap();
-session.extend(&Buffer::load(GRAPH_PATH).unwrap()).unwrap(); // c = a * b
+session.extend(&Buffer::load(graph).unwrap()).unwrap();
 
 let mut inputs = vec![Input::new("a"), Input::new("b")];
 inputs[0].set(Tensor::new(vec![1f32, 2.0, 3.0], &[3]).unwrap());
