@@ -44,7 +44,7 @@ impl<T> Drop for Tensor<T> {
 
 pub fn copy_raw<T>(tensor: &Tensor<T>) -> Result<*mut ffi::TF_Tensor> where T: Value {
     Ok(nonnull!(ffi!(TF_NewTensor(T::kind().into(), tensor.dimensions.as_ptr() as *mut _,
-                     tensor.dimensions.len() as c_int, tensor.memory.as_ptr() as *mut _,
+                     tensor.dimensions.len() as c_int, tensor.as_ptr() as *mut _,
                      tensor.len() as size_t, Some(noop), ptr::null_mut()))))
 }
 
