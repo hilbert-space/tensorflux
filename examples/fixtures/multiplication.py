@@ -1,8 +1,8 @@
 import os
 import tensorflow as tf
 
-a = tf.Variable(0.0, name='a')
-b = tf.Variable(0.0, name='b')
+a = tf.placeholder(tf.float32, name='a')
+b = tf.placeholder(tf.float32, name='b')
 c = tf.mul(a, b, name='c')
 
 definition = tf.Session().graph_def
