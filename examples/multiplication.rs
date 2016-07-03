@@ -5,7 +5,7 @@ use tensorflux::{Buffer, Input, Options, Output, Session, Tensor};
 macro_rules! ok(($result:expr) => ($result.unwrap()));
 
 fn main() {
-    let graph = "examples/fixtures/graph.pb"; // c = a * b
+    let graph = "examples/fixtures/multiplication.pb"; // c = a * b
     let mut session = ok!(Session::new(&ok!(Options::new())));
     ok!(session.extend(&ok!(Buffer::load(graph))));
 

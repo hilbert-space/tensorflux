@@ -11,11 +11,11 @@ Create a graph in Python:
 ```python
 import tensorflow as tf
 
-with tf.Session() as session:
-    a = tf.Variable(0.0, name='a')
-    b = tf.Variable(0.0, name='b')
-    c = tf.mul(a, b, name='c')
-    tf.train.write_graph(session.graph_def, '', 'graph.pb', as_text=False)
+a = tf.Variable(0.0, name='a')
+b = tf.Variable(0.0, name='b')
+c = tf.mul(a, b, name='c')
+
+tf.train.write_graph(tf.Session().graph_def, '', 'graph.pb', as_text=False)
 ```
 
 Evaluate the graph in Rust:
@@ -51,7 +51,7 @@ will be licensed according to the terms given in [LICENSE.md](LICENSE.md).
 
 [configuration]: https://github.com/stainless-steel/tensorflow-sys#configuration
 [documentation]: https://stainless-steel.github.io/tensorflux
-[example]: examples/workflow.rs
+[example]: examples/multiplication.rs
 [requirements]: https://github.com/stainless-steel/tensorflow-sys#requirements
 [tensorflow]: https://www.tensorflow.org
 

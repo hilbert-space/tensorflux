@@ -9,11 +9,11 @@
 //! ```python
 //! import tensorflow as tf
 //!
-//! with tf.Session() as session:
-//!     a = tf.Variable(0.0, name='a')
-//!     b = tf.Variable(0.0, name='b')
-//!     c = tf.mul(a, b, name='c')
-//!     tf.train.write_graph(session.graph_def, '', 'graph.pb', as_text=False)
+//! a = tf.Variable(0.0, name='a')
+//! b = tf.Variable(0.0, name='b')
+//! c = tf.mul(a, b, name='c')
+//!
+//! tf.train.write_graph(tf.Session().graph_def, '', 'graph.pb', as_text=False)
 //! ```
 //!
 //! Evaluate the graph in Rust:
@@ -22,7 +22,7 @@
 //! use tensorflux::{Buffer, Input, Options, Output, Session, Tensor};
 //!
 //! let graph = "graph.pb"; // c = a * b
-//! # let graph = "examples/fixtures/graph.pb";
+//! # let graph = "examples/fixtures/multiplication.pb";
 //! let mut session = Session::new(&Options::new().unwrap()).unwrap();
 //! session.extend(&Buffer::load(graph).unwrap()).unwrap();
 //!
