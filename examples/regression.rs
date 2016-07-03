@@ -7,22 +7,23 @@ use tensorflux::{Buffer, Input, Options, Output, Session, Target, Tensor};
 macro_rules! ok(($result:expr) => ($result.unwrap()));
 
 fn main() {
-    let (x, y) = generate(0.1, 0.3, 100, random::default().seed([42, 69]));
+    let (w, b, n, steps) = (0.1, 0.3, 100, 201);
+    let (x, y) = generate(w, b, n, random::default().seed([42, 69]));
 
     let graph = "examples/fixtures/regression.pb"; // y = w * x + b
     let mut session = ok!(Session::new(&ok!(Options::new())));
     ok!(session.extend(&ok!(Buffer::load(graph))));
 
     let mut inputs = vec![Input::new("x"), Input::new("y")];
-    inputs[0].set(ok!(Tensor::new(x.clone(), &[100])));
-    inputs[1].set(ok!(Tensor::new(y.clone(), &[100])));
+    inputs[0].set(ok!(Tensor::new(x.clone(), &[n])));
+    inputs[1].set(ok!(Tensor::new(y.clone(), &[n])));
     let targets = vec![Target::new("init")];
     ok!(session.run(&mut inputs, &mut [], &targets, None, None));
 
     let targets = vec![Target::new("train")];
-    for _ in 0..201 {
-        inputs[0].set(ok!(Tensor::new(x.clone(), &[100])));
-        inputs[1].set(ok!(Tensor::new(y.clone(), &[100])));
+    for _ in 0..steps {
+        inputs[0].set(ok!(Tensor::new(x.clone(), &[n])));
+        inputs[1].set(ok!(Tensor::new(y.clone(), &[n])));
         ok!(session.run(&mut inputs, &mut [], &targets, None, None));
     }
 
