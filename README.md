@@ -40,6 +40,8 @@ let c = ok!(outputs[0].get::<f32>());
 assert_eq!(&c[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
 ```
 
+This and other examples can be found in the [examples](examples) directory.
+
 ## [Requirements][requirements]
 
 ## [Configuration][configuration]
