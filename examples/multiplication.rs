@@ -15,7 +15,7 @@ fn main() {
 
     let mut outputs = vec![Output::new("c")];
 
-    ok!(session.run(&mut inputs, &mut outputs, None, None));
+    ok!(session.run(&mut inputs, &mut outputs, &[], None, None));
 
     let result = ok!(outputs[0].get::<f32>());
     assert_eq!(&result[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);

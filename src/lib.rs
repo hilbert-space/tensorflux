@@ -32,7 +32,7 @@
 //!
 //! let mut outputs = vec![Output::new("c")];
 //!
-//! session.run(&mut inputs, &mut outputs, None, None).unwrap();
+//! session.run(&mut inputs, &mut outputs, &[], None, None).unwrap();
 //!
 //! let result = outputs[0].get::<f32>().unwrap();
 //! assert_eq!(&result[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
@@ -60,7 +60,7 @@ pub use buffer::Buffer;
 pub use error::Error;
 pub use kind::{Type, Value};
 pub use options::Options;
-pub use session::{Input, Output, Session};
+pub use session::{Input, Output, Session, Target};
 pub use tensor::Tensor;
 
 /// A result.

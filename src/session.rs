@@ -28,6 +28,11 @@ pub struct Output {
     tensor: Option<*mut ffi::TF_Tensor>,
 }
 
+/// A target.
+pub struct Target {
+    name: CString,
+}
+
 trait Flexor {
     fn into_raw(&mut self) -> *mut ffi::TF_Tensor;
 }
@@ -65,7 +70,7 @@ impl Session {
     /// TensorFlow’s [repository][1].
     ///
     /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
-    pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output],
+    pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output], targets: &[Target],
                options: Option<&Buffer>, metadata: Option<&mut Buffer>) -> Result<()> {
 
         let ni = inputs.len();
@@ -90,7 +95,11 @@ impl Session {
             output_names[i] = outputs[i].name.as_ptr();
         }
 
-        let mut target_names = vec![];
+        let nt = targets.len();
+        let mut target_names = vec![ptr::null(); nt];
+        for i in 0..nt {
+            target_names[i] = targets[i].name.as_ptr();
+        }
 
         let options_buffer = if let Some(buffer) = options {
             buffer::as_raw(buffer)
@@ -106,8 +115,8 @@ impl Session {
 
         ok!(ffi!(TF_Run(self.raw, options_buffer, input_names.as_mut_ptr(),
                         input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
-                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(), 0,
-                        metadata_buffer, status::as_raw(&self.status))),
+                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
+                        nt as c_int, metadata_buffer, status::as_raw(&self.status))),
             &self.status);
 
         for i in 0..no {
@@ -172,6 +181,14 @@ impl Drop for Output {
         if let Some(tensor) = self.tensor.take() {
             ffi!(TF_DeleteTensor(tensor));
         }
+    }
+}
+
+impl Target {
+    /// Create a target.
+    #[inline]
+    pub fn new<T>(name: T) -> Self where T: Into<String> {
+        Target { name: into_cstring!(name) }
     }
 }
 
