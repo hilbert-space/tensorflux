@@ -11,7 +11,8 @@ install:
 script:
   - cargo test -vv -j 1
   - cargo test -vv -j 1 --features=complex
-  - cargo run --example=workflow
+  - cargo run --example=multiplication
+  - cargo run --example=regression
 
 after_success:
   - export CARGO_FLAGS="--features=complex"

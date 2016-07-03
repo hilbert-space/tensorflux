@@ -11,11 +11,11 @@ Create a graph in Python:
 ```python
 import tensorflow as tf
 
-with tf.Session() as session:
-    a = tf.Variable(0.0, name='a')
-    b = tf.Variable(0.0, name='b')
-    c = tf.mul(a, b, name='c')
-    tf.train.write_graph(session.graph_def, '', 'graph.pb', as_text=False)
+a = tf.placeholder(tf.float32, name='a')
+b = tf.placeholder(tf.float32, name='b')
+c = tf.mul(a, b, name='c')
+
+tf.train.write_graph(tf.Session().graph_def, '', 'graph.pb', as_text=False)
 ```
 
 Evaluate the graph in Rust:
@@ -23,20 +23,21 @@ Evaluate the graph in Rust:
 ```rust
 use tensorflux::{Buffer, Input, Options, Output, Session, Tensor};
 
+macro_rules! ok(($result:expr) => ($result.unwrap()));
+
 let graph = "graph.pb"; // c = a * b
-let mut session = Session::new(&Options::new().unwrap()).unwrap();
-session.extend(&Buffer::load(graph).unwrap()).unwrap();
+let mut session = ok!(Session::new(&ok!(Options::new())));
+ok!(session.extend(&ok!(Buffer::load(graph))));
 
-let mut inputs = vec![Input::new("a"), Input::new("b")];
-inputs[0].set(Tensor::new(vec![1f32, 2.0, 3.0], &[3]).unwrap());
-inputs[1].set(Tensor::new(vec![4f32, 5.0, 6.0], &[3]).unwrap());
+let a = ok!(Tensor::new(vec![1f32, 2.0, 3.0], &[3]));
+let b = ok!(Tensor::new(vec![4f32, 5.0, 6.0], &[3]));
 
+let inputs = vec![Input::new("a", a), Input::new("b", b)];
 let mut outputs = vec![Output::new("c")];
+ok!(session.run(&inputs, &mut outputs, &[], None, None));
 
-session.run(&mut inputs, &mut outputs, None, None).unwrap();
-
-let result = outputs[0].get::<f32>().unwrap();
-assert_eq!(&result[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
+let c = ok!(outputs[0].get::<f32>());
+assert_eq!(&c[..], &[1.0 * 4.0, 2.0 * 5.0, 3.0 * 6.0]);
 ```
 
 ## [Requirements][requirements]
@@ -51,7 +52,7 @@ will be licensed according to the terms given in [LICENSE.md](LICENSE.md).
 
 [configuration]: https://github.com/stainless-steel/tensorflow-sys#configuration
 [documentation]: https://stainless-steel.github.io/tensorflux
-[example]: examples/workflow.rs
+[example]: examples/multiplication.rs
 [requirements]: https://github.com/stainless-steel/tensorflow-sys#requirements
 [tensorflow]: https://www.tensorflow.org
 

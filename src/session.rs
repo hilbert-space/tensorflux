@@ -28,8 +28,13 @@ pub struct Output {
     tensor: Option<*mut ffi::TF_Tensor>,
 }
 
+/// A target.
+pub struct Target {
+    name: CString,
+}
+
 trait Flexor {
-    fn into_raw(&mut self) -> *mut ffi::TF_Tensor;
+    fn copy_raw(&self) -> Result<*mut ffi::TF_Tensor>;
 }
 
 impl Session {
@@ -65,22 +70,32 @@ impl Session {
     /// TensorFlow’s [repository][1].
     ///
     /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
-    pub fn run(&mut self, inputs: &mut [Input], outputs: &mut [Output],
+    pub fn run(&mut self, inputs: &[Input], outputs: &mut [Output], targets: &[Target],
                options: Option<&Buffer>, metadata: Option<&mut Buffer>) -> Result<()> {
 
         let ni = inputs.len();
         let mut input_names = vec![ptr::null(); ni];
         let mut input_tensors = vec![ptr::null_mut(); ni];
-        let mut input_garbage = Vec::with_capacity(ni);
+
+        macro_rules! cleanup(() => ({
+            for tensor in input_tensors.drain(..) {
+                ffi!(TF_DeleteTensor(tensor));
+            }
+        }));
+
         for i in 0..ni {
             input_names[i] = inputs[i].name.as_ptr();
-            match inputs[i].tensor.take() {
-                Some(mut tensor) => {
-                    input_tensors[i] = tensor.into_raw();
-                    input_garbage.push(tensor);
+            input_tensors[i] = match inputs[i].tensor.as_ref().map(|tensor| tensor.copy_raw()) {
+                Some(Ok(tensor)) => tensor,
+                Some(Err(error)) => {
+                    cleanup!();
+                    return Err(error);
                 },
-                _ => raise!("some of the inputs have not been set"),
-            }
+                _ => {
+                    cleanup!();
+                    raise!("some of the inputs have not been set");
+                },
+            };
         }
 
         let no = outputs.len();
@@ -90,7 +105,11 @@ impl Session {
             output_names[i] = outputs[i].name.as_ptr();
         }
 
-        let mut target_names = vec![];
+        let nt = targets.len();
+        let mut target_names = vec![ptr::null(); nt];
+        for i in 0..nt {
+            target_names[i] = targets[i].name.as_ptr();
+        }
 
         let options_buffer = if let Some(buffer) = options {
             buffer::as_raw(buffer)
@@ -106,8 +125,8 @@ impl Session {
 
         ok!(ffi!(TF_Run(self.raw, options_buffer, input_names.as_mut_ptr(),
                         input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
-                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(), 0,
-                        metadata_buffer, status::as_raw(&self.status))),
+                        output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
+                        nt as c_int, metadata_buffer, status::as_raw(&self.status))),
             &self.status);
 
         for i in 0..no {
@@ -133,11 +152,12 @@ impl Drop for Session {
 impl Input {
     /// Create an input.
     #[inline]
-    pub fn new<T>(name: T) -> Self where T: Into<String> {
-        Input { name: into_cstring!(name), tensor: None }
+    pub fn new<T, U>(name: T, tensor: Tensor<U>) -> Self where T: Into<String>, U: Value {
+        Input { name: into_cstring!(name), tensor: Some(Box::new(tensor)) }
     }
 
     /// Assign a tensor.
+    #[inline]
     pub fn set<T>(&mut self, tensor: Tensor<T>) where T: Value {
         self.tensor = Some(Box::new(tensor));
     }
@@ -154,7 +174,7 @@ impl Output {
     pub fn get<T>(&mut self) -> Result<Tensor<T>> where T: Value {
         match self.tensor.take() {
             Some(tensor) => tensor::from_raw(tensor),
-            _ => raise!("the output has not been processed"),
+            _ => raise!("the output has not been set"),
         }
     }
 
@@ -175,9 +195,17 @@ impl Drop for Output {
     }
 }
 
-impl<T> Flexor for Tensor<T> {
+impl Target {
+    /// Create a target.
+    #[inline]
+    pub fn new<T>(name: T) -> Self where T: Into<String> {
+        Target { name: into_cstring!(name) }
+    }
+}
+
+impl<T> Flexor for Tensor<T> where T: Value {
     #[inline(always)]
-    fn into_raw(&mut self) -> *mut ffi::TF_Tensor {
-        tensor::into_raw(self)
+    fn copy_raw(&self) -> Result<*mut ffi::TF_Tensor> {
+        tensor::copy_raw(self)
     }
 }
