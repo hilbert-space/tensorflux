@@ -14,21 +14,20 @@ fn main() {
     let mut session = ok!(Session::new(&ok!(Options::new())));
     ok!(session.extend(&ok!(Buffer::load(graph))));
 
-    let mut inputs = vec![Input::new("x"), Input::new("y")];
-    inputs[0].set(ok!(Tensor::new(x.clone(), &[n])));
-    inputs[1].set(ok!(Tensor::new(y.clone(), &[n])));
+    let inputs = vec![
+        Input::new("x", ok!(Tensor::new(x, &[n]))),
+        Input::new("y", ok!(Tensor::new(y, &[n]))),
+    ];
     let targets = vec![Target::new("init")];
-    ok!(session.run(&mut inputs, &mut [], &targets, None, None));
+    ok!(session.run(&inputs, &mut [], &targets, None, None));
 
     let targets = vec![Target::new("train")];
     for _ in 0..steps {
-        inputs[0].set(ok!(Tensor::new(x.clone(), &[n])));
-        inputs[1].set(ok!(Tensor::new(y.clone(), &[n])));
-        ok!(session.run(&mut inputs, &mut [], &targets, None, None));
+        ok!(session.run(&inputs, &mut [], &targets, None, None));
     }
 
     let mut outputs = vec![Output::new("w"), Output::new("b")];
-    ok!(session.run(&mut [], &mut outputs, &[], None, None));
+    ok!(session.run(&[], &mut outputs, &[], None, None));
 
     let w_hat = ok!(outputs[0].get::<f32>())[0];
     let b_hat = ok!(outputs[1].get::<f32>())[0];
