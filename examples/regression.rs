@@ -10,7 +10,7 @@ fn main() {
     let (w, b, n, steps) = (0.1, 0.3, 100, 201);
     let (x, y) = generate(w, b, n, random::default().seed([42, 69]));
 
-    let graph = "examples/fixtures/regression.pb"; // y = w * x + b
+    let graph = "examples/assets/regression.pb"; // y = w * x + b
     let mut session = ok!(Session::new(&ok!(Options::new())));
     ok!(session.extend(&ok!(Buffer::load(graph))));
 

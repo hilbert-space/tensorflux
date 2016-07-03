@@ -22,7 +22,7 @@
 //! use tensorflux::{Buffer, Input, Options, Output, Session, Tensor};
 //!
 //! let graph = "graph.pb"; // c = a * b
-//! # let graph = "examples/fixtures/multiplication.pb";
+//! # let graph = "examples/assets/multiplication.pb";
 //! let mut session = Session::new(&Options::new().unwrap()).unwrap();
 //! session.extend(&Buffer::load(graph).unwrap()).unwrap();
 //!
