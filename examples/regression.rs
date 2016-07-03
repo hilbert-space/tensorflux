@@ -30,10 +30,11 @@ fn main() {
     let mut outputs = vec![Output::new("w"), Output::new("b")];
     ok!(session.run(&mut [], &mut outputs, &[], None, None));
 
-    let w = ok!(outputs[0].get::<f32>())[0];
-    let b = ok!(outputs[1].get::<f32>())[0];
+    let w_hat = ok!(outputs[0].get::<f32>())[0];
+    let b_hat = ok!(outputs[1].get::<f32>())[0];
 
-    println!("w: {}, b: {}", w, b);
+    assert!((w_hat - w).abs() < 1e-3);
+    assert!((b_hat - b).abs() < 1e-3);
 }
 
 fn generate<T: Source>(w: f32, b: f32, n: usize, mut source: T) -> (Vec<f32>, Vec<f32>) {
