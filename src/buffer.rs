@@ -1,6 +1,5 @@
 use ffi::TF_Buffer;
 use libc::size_t;
-
 use std::fs::File;
 use std::io::Read;
 use std::mem;
