@@ -1,4 +1,4 @@
-use ffi;
+use ffi::TF_SessionOptions;
 use libc::size_t;
 use std::ffi::CString;
 use std::mem;
@@ -11,7 +11,7 @@ use status::{self, Status};
 pub struct Options {
     status: Status,
     target: Option<CString>,
-    raw: *mut ffi::TF_SessionOptions,
+    raw: *mut TF_SessionOptions,
 }
 
 impl Options {
@@ -54,6 +54,6 @@ impl Drop for Options {
 }
 
 #[inline(always)]
-pub fn as_raw(options: &Options) -> *mut ffi::TF_SessionOptions {
+pub fn as_raw(options: &Options) -> *mut TF_SessionOptions {
     options.raw
 }

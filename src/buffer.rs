@@ -1,4 +1,4 @@
-use ffi;
+use ffi::TF_Buffer;
 use libc::size_t;
 
 use std::fs::File;
@@ -12,7 +12,7 @@ use memory::Memory;
 /// A buffer.
 pub struct Buffer {
     memory: Memory<u8>,
-    raw: *mut ffi::TF_Buffer,
+    raw: *mut TF_Buffer,
 }
 
 impl Buffer {
@@ -46,7 +46,7 @@ impl Drop for Buffer {
 }
 
 #[inline(always)]
-pub fn as_raw(buffer: &Buffer) -> *mut ffi::TF_Buffer {
+pub fn as_raw(buffer: &Buffer) -> *mut TF_Buffer {
     buffer.raw
 }
 

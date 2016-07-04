@@ -1,4 +1,4 @@
-use ffi;
+use ffi::TF_Tensor;
 use libc::{c_int, c_longlong, c_void, size_t};
 use std::ptr;
 
@@ -10,7 +10,7 @@ use value::Value;
 pub struct Tensor<T> {
     dimensions: Vec<c_longlong>,
     memory: Memory<T>,
-    raw: *mut ffi::TF_Tensor,
+    raw: *mut TF_Tensor,
 }
 
 impl<T> Tensor<T> where T: Value {
@@ -42,13 +42,13 @@ impl<T> Drop for Tensor<T> {
     }
 }
 
-pub fn copy_raw<T>(tensor: &Tensor<T>) -> Result<*mut ffi::TF_Tensor> where T: Value {
+pub fn copy_raw<T>(tensor: &Tensor<T>) -> Result<*mut TF_Tensor> where T: Value {
     Ok(nonnull!(ffi!(TF_NewTensor(T::kind(), tensor.dimensions.as_ptr() as *mut _,
                      tensor.dimensions.len() as c_int, tensor.as_ptr() as *mut _,
                      tensor.len() as size_t, Some(noop), ptr::null_mut()))))
 }
 
-pub fn from_raw<T>(raw: *mut ffi::TF_Tensor) -> Result<Tensor<T>> where T: Value {
+pub fn from_raw<T>(raw: *mut TF_Tensor) -> Result<Tensor<T>> where T: Value {
     if ffi!(TF_TensorType(raw)) != T::kind() {
         raise!("the data types do not match");
     }

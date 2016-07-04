@@ -1,9 +1,9 @@
-use ffi;
+use ffi::TF_Status;
 
 use Result;
 
 pub struct Status {
-    raw: *mut ffi::TF_Status,
+    raw: *mut TF_Status,
 }
 
 impl Status {
@@ -20,6 +20,6 @@ impl Drop for Status {
 }
 
 #[inline(always)]
-pub fn as_raw(status: &Status) -> *mut ffi::TF_Status {
+pub fn as_raw(status: &Status) -> *mut TF_Status {
     status.raw
 }
