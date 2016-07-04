@@ -112,12 +112,12 @@ macro_rules! ok(
 
 macro_rules! raise(
     ($template:expr, $($argument:tt)*) => (raise!(format!($template, $($argument)*)));
-    ($message:expr) => (return Err(::Error::from($message)));
+    ($message:expr) => (return Err(::error::Error::from($message)));
 );
 
 macro_rules! success(
     ($status:expr) => (
-        if let Some(error) = ::Error::current($status) {
+        if let Some(error) = ::error::from_status($status) {
             return Err(error);
         }
     );
