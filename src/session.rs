@@ -1,4 +1,4 @@
-use ffi;
+use ffi::{TF_DataType, TF_Session, TF_Tensor};
 use libc::{c_int, size_t};
 use std::ffi::CString;
 use std::{mem, ptr};
@@ -13,7 +13,7 @@ use value::Value;
 /// A session.
 pub struct Session {
     status: Status,
-    raw: *mut ffi::TF_Session,
+    raw: *mut TF_Session,
 }
 
 /// An input.
@@ -25,7 +25,7 @@ pub struct Input {
 /// An output.
 pub struct Output {
     name: CString,
-    tensor: Option<*mut ffi::TF_Tensor>,
+    tensor: Option<*mut TF_Tensor>,
 }
 
 /// A target.
@@ -34,7 +34,8 @@ pub struct Target {
 }
 
 trait Flexor {
-    fn copy_raw(&self) -> Result<*mut ffi::TF_Tensor>;
+    fn copy_raw(&self) -> Result<*mut TF_Tensor>;
+    fn kind(&self) -> TF_DataType;
 }
 
 impl Session {
@@ -156,6 +157,18 @@ impl Input {
         Input { name: into_cstring!(name), tensor: Some(Box::new(tensor)) }
     }
 
+    /// Extract the tensor.
+    pub fn get<T>(&mut self) -> Result<Tensor<T>> where T: Value {
+        if self.tensor.is_none() {
+            raise!("the tensor has not been set");
+        }
+        if self.tensor.as_ref().unwrap().kind() != T::kind() {
+            raise!("the data types do not match");
+        }
+        let tensor = self.tensor.take().unwrap();
+        Ok(*unsafe { Box::from_raw(Box::into_raw(tensor) as *mut _) })
+    }
+
     /// Assign a tensor.
     #[inline]
     pub fn set<T>(&mut self, tensor: Tensor<T>) where T: Value {
@@ -174,12 +187,12 @@ impl Output {
     pub fn get<T>(&mut self) -> Result<Tensor<T>> where T: Value {
         match self.tensor.take() {
             Some(tensor) => tensor::from_raw(tensor),
-            _ => raise!("the output has not been set"),
+            _ => raise!("the tensor has not been set"),
         }
     }
 
     #[inline]
-    fn set(&mut self, tensor: *mut ffi::TF_Tensor) {
+    fn set(&mut self, tensor: *mut TF_Tensor) {
         if let Some(tensor) = mem::replace(&mut self.tensor, Some(tensor)) {
             ffi!(TF_DeleteTensor(tensor));
         }
@@ -205,7 +218,26 @@ impl Target {
 
 impl<T> Flexor for Tensor<T> where T: Value {
     #[inline(always)]
-    fn copy_raw(&self) -> Result<*mut ffi::TF_Tensor> {
+    fn copy_raw(&self) -> Result<*mut TF_Tensor> {
         tensor::copy_raw(self)
+    }
+
+    #[inline(always)]
+    fn kind(&self) -> TF_DataType {
+        T::kind()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use session::Input;
+    use tensor::Tensor;
+
+    #[test]
+    fn input_get() {
+        let a = Tensor::new(vec![42.0, 69.0], &[2]).unwrap();
+        let mut a = Input::new("a", a);
+        let a = a.get::<f64>().unwrap();
+        assert_eq!(&a[..], &[42.0, 69.0]);
     }
 }
