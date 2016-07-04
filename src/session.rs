@@ -5,10 +5,10 @@ use std::{mem, ptr};
 
 use Result;
 use buffer::{self, Buffer};
-use kind::Value;
 use options::{self, Options};
 use status::{self, Status};
 use tensor::{self, Tensor};
+use value::Value;
 
 /// A session.
 pub struct Session {

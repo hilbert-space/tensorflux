@@ -122,34 +122,3 @@ macro_rules! success(
         }
     );
 );
-
-macro_rules! translate {
-    (
-        $(#[$attribute:meta])*
-        pub struct $from_type:ident => $into_type:ident,
-        $($from_variant:ident => $into_variant:ident,)*
-    ) => {
-        $(#[$attribute])*
-        #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-        pub enum $from_type {
-            $($from_variant,)*
-        }
-
-        impl From<::ffi::$into_type> for $from_type {
-            fn from(variant: ::ffi::$into_type) -> Self {
-                match variant {
-                    $(::ffi::$into_variant => $from_type::$from_variant,)*
-                }
-            }
-        }
-
-        impl From<$from_type> for ::ffi::$into_type {
-            fn from(variant: $from_type) -> Self {
-                match variant {
-                    $($from_type::$from_variant => ::ffi::$into_variant,)*
-                }
-            }
-        }
-    }
-}
-

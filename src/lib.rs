@@ -50,19 +50,19 @@ mod macros;
 
 mod buffer;
 mod error;
-mod kind;
 mod memory;
 mod options;
 mod session;
 mod status;
 mod tensor;
+mod value;
 
 pub use buffer::Buffer;
 pub use error::Error;
-pub use kind::{Type, Value};
 pub use options::Options;
 pub use session::{Input, Output, Session, Target};
 pub use tensor::Tensor;
+pub use value::Value;
 
 /// A result.
 pub type Result<T> = std::result::Result<T, Error>;
