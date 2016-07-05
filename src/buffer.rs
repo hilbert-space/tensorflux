@@ -44,7 +44,7 @@ impl Drop for Buffer {
     }
 }
 
-#[inline(always)]
+#[inline]
 pub fn as_raw(buffer: &Buffer) -> *mut TF_Buffer {
     buffer.raw
 }

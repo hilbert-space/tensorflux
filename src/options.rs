@@ -53,7 +53,7 @@ impl Drop for Options {
     }
 }
 
-#[inline(always)]
+#[inline]
 pub fn as_raw(options: &Options) -> *mut TF_SessionOptions {
     options.raw
 }

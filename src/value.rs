@@ -9,7 +9,7 @@ pub trait Value: 'static {
 macro_rules! implement {
     ($($native:path => $variant:ident,)*) => {
         $(impl Value for $native {
-            #[inline(always)]
+            #[inline]
             fn kind() -> TF_DataType {
                 TF_DataType::$variant
             }

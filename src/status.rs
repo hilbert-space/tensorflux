@@ -19,7 +19,7 @@ impl Drop for Status {
     }
 }
 
-#[inline(always)]
+#[inline]
 pub fn as_raw(status: &Status) -> *mut TF_Status {
     status.raw
 }
