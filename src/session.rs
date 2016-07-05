@@ -217,12 +217,12 @@ impl Target {
 }
 
 impl<T> Flexor for Tensor<T> where T: Value {
-    #[inline(always)]
+    #[inline]
     fn copy_raw(&self) -> Result<*mut TF_Tensor> {
         tensor::copy_raw(self)
     }
 
-    #[inline(always)]
+    #[inline]
     fn kind(&self) -> TF_DataType {
         T::kind()
     }
