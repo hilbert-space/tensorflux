@@ -40,7 +40,7 @@
 //! ```
 
 extern crate libc;
-extern crate tensorflow_sys as ffi;
+extern crate tensorflux_sys as ffi;
 
 #[cfg(feature = "complex")]
 extern crate num_complex as num;

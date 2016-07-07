@@ -14,7 +14,7 @@ complex = ["num-complex"]
 [dependencies]
 libc = "0.2"
 num-complex = { version = "0.1", default-features = false, optional = true }
-tensorflow-sys = "0.3"
+tensorflux-sys = "0.1"
 
 [dev-dependencies]
 random = "0.11"
