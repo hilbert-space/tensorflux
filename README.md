@@ -1,10 +1,10 @@
-# TensorFlux [![Version][version-img]][version-url] [![Status][status-img]][status-url]
+# TensorFlux [![Version][version-icon]][version-page] [![Status][status-icon]][status-page]
 
 The package provides an interface to [TensorFlow][tensorflow].
 
 ## [Documentation][documentation]
 
-## [Example][example]
+## [Example](examples/multiplication.rs)
 
 Create a graph in Python:
 
@@ -54,11 +54,10 @@ will be licensed according to the terms given in [LICENSE.md](LICENSE.md).
 
 [configuration]: https://github.com/stainless-steel/tensorflow-sys#configuration
 [documentation]: https://stainless-steel.github.io/tensorflux
-[example]: examples/multiplication.rs
 [requirements]: https://github.com/stainless-steel/tensorflow-sys#requirements
 [tensorflow]: https://www.tensorflow.org
 
-[status-img]: https://travis-ci.org/stainless-steel/tensorflux.svg?branch=master
-[status-url]: https://travis-ci.org/stainless-steel/tensorflux
-[version-img]: https://img.shields.io/crates/v/tensorflux.svg
-[version-url]: https://crates.io/crates/tensorflux
+[status-icon]: https://travis-ci.org/stainless-steel/tensorflux.svg?branch=master
+[status-page]: https://travis-ci.org/stainless-steel/tensorflux
+[version-icon]: https://img.shields.io/crates/v/tensorflux.svg
+[version-page]: https://crates.io/crates/tensorflux
