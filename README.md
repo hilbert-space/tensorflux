@@ -52,9 +52,9 @@ Your contribution is highly appreciated. Do not hesitate to open an issue or a
 pull request. Note that any contribution submitted for inclusion in the project
 will be licensed according to the terms given in [LICENSE.md](LICENSE.md).
 
-[configuration]: https://github.com/stainless-steel/tensorflow-sys#configuration
+[configuration]: https://github.com/stainless-steel/tensorflux-sys#configuration
 [documentation]: https://stainless-steel.github.io/tensorflux
-[requirements]: https://github.com/stainless-steel/tensorflow-sys#requirements
+[requirements]: https://github.com/stainless-steel/tensorflux-sys#requirements
 [tensorflow]: https://www.tensorflow.org
 
 [status-icon]: https://travis-ci.org/stainless-steel/tensorflux.svg?branch=master
