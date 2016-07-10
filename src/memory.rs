@@ -13,9 +13,8 @@ impl<T> Memory<T> {
     }
 
     #[inline]
-    pub fn from_raw(pointer: *mut T, length: usize) -> Self {
-        let data = unsafe { Vec::from_raw_parts(pointer, length, length) };
-        Memory { data: data, owned: false }
+    pub unsafe fn from_raw_parts(pointer: *mut T, length: usize) -> Self {
+        Memory { data: Vec::from_raw_parts(pointer, length, length), owned: false }
     }
 
     pub fn empty(&mut self) -> Vec<T> where T: Clone {

@@ -5,11 +5,10 @@ use std::mem;
 
 use Result;
 use buffer::Buffer;
-use status::{self, Status};
+use status::Status;
 
 /// Options.
 pub struct Options {
-    status: Status,
     target: Option<CString>,
     raw: *mut TF_SessionOptions,
 }
@@ -17,11 +16,7 @@ pub struct Options {
 impl Options {
     /// Create options.
     pub fn new() -> Result<Self> {
-        Ok(Options {
-            status: try!(Status::new()),
-            target: None,
-            raw: nonnull!(ffi!(TF_NewSessionOptions())),
-        })
+        Ok(Options { target: None, raw: nonnull!(ffi!(TF_NewSessionOptions())) })
     }
 
     /// Configure using a protocol buffer.
@@ -31,10 +26,10 @@ impl Options {
     ///
     /// [1]: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/config.proto
     pub fn configure(&mut self, configuration: &Buffer) -> Result<()> {
+        let status = try!(Status::new());
         let configuration = configuration.as_ref();
         ok!(ffi!(TF_SetConfig(self.raw, configuration.as_ptr() as *const _,
-                              configuration.len() as size_t, status::as_raw(&self.status))),
-            &self.status);
+                              configuration.len() as size_t, status.as_raw())), &status);
         Ok(())
     }
 
@@ -44,6 +39,12 @@ impl Options {
         ffi!(TF_SetTarget(self.raw, target.as_ptr()));
         mem::replace(&mut self.target, Some(target));
     }
+
+    #[doc(hidden)]
+    #[inline]
+    pub fn as_raw(&self) -> *mut TF_SessionOptions {
+        self.raw
+    }
 }
 
 impl Drop for Options {
@@ -51,9 +52,4 @@ impl Drop for Options {
     fn drop(&mut self) {
         ffi!(TF_DeleteSessionOptions(self.raw));
     }
-}
-
-#[inline]
-pub fn as_raw(options: &Options) -> *mut TF_SessionOptions {
-    options.raw
 }

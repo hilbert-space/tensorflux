@@ -54,11 +54,13 @@ mod memory;
 mod options;
 mod session;
 mod status;
+mod library;
 mod tensor;
 mod value;
 
 pub use buffer::Buffer;
 pub use error::Error;
+pub use library::Library;
 pub use options::Options;
 pub use session::{Input, Output, Session, Target};
 pub use tensor::Tensor;

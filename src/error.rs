@@ -2,7 +2,7 @@ use ffi::TF_Code;
 use std::ffi::CStr;
 use std::{error, fmt};
 
-use status::{self, Status};
+use status:: Status;
 
 /// An error.
 #[derive(Clone, Debug)]
@@ -32,10 +32,10 @@ impl<T> From<T> for Error where T: Into<String> {
 }
 
 pub fn from_status(status: &Status) -> Option<Error> {
-    if ffi!(TF_GetCode(status::as_raw(status))) == TF_Code::TF_OK {
+    if ffi!(TF_GetCode(status.as_raw())) == TF_Code::TF_OK {
         return None;
     }
-    let message = ffi!(TF_Message(status::as_raw(status)));
+    let message = ffi!(TF_Message(status.as_raw()));
     if message.is_null() {
         return None;
     }

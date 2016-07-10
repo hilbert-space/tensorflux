@@ -11,46 +11,53 @@ use memory::Memory;
 /// A buffer.
 pub struct Buffer {
     memory: Memory<u8>,
-    raw: *mut TF_Buffer,
+    raw: TF_Buffer,
 }
 
 impl Buffer {
     /// Create a buffer.
-    pub fn new(data: Vec<u8>) -> Result<Self> {
-        let raw = ffi!(TF_NewBuffer());
-        unsafe {
-            (*raw).data = data.as_ptr() as *mut _;
-            (*raw).length = data.len() as size_t;
-            (*raw).data_deallocator = None;
-        }
-        Ok(Buffer { memory: Memory::new(data), raw: raw })
+    #[inline]
+    pub fn new(data: Vec<u8>) -> Self {
+        Memory::new(data).into()
+    }
+
+    /// Create a buffer from raw parts.
+    #[inline]
+    pub unsafe fn from_raw_parts(pointer: *mut u8, length: usize) -> Buffer {
+        Memory::from_raw_parts(pointer, length).into()
     }
 
     /// Load a buffer.
-    pub fn load<T: AsRef<Path>>(path: T) -> Result<Self> {
+    pub fn load<T>(path: T) -> Result<Self> where T: AsRef<Path> {
         let mut data = vec![];
         let mut file = ok!(File::open(path));
         ok!(file.read_to_end(&mut data));
-        Buffer::new(data)
+        Ok(Buffer::new(data))
+    }
+
+    #[doc(hidden)]
+    #[inline]
+    pub fn as_raw(&self) -> *mut TF_Buffer {
+        &self.raw as *const _ as *mut _
+    }
+
+    #[doc(hidden)]
+    pub unsafe fn reset(&mut self) {
+        let mut memory = Memory::from_raw_parts(self.raw.data as *mut _, self.raw.length as usize);
+        mem::swap(&mut self.memory, &mut memory);
     }
 }
 
 memory!(Buffer<u8>);
 
-impl Drop for Buffer {
-    #[inline]
-    fn drop(&mut self) {
-        ffi!(TF_DeleteBuffer(self.raw));
+#[doc(hidden)]
+impl From<Memory<u8>> for Buffer {
+    fn from(memory: Memory<u8>) -> Self {
+        let raw = TF_Buffer {
+            data: memory.as_ptr() as *mut _,
+            length: memory.len() as size_t,
+            data_deallocator: None,
+        };
+        Buffer { memory: memory, raw: raw }
     }
-}
-
-#[inline]
-pub fn as_raw(buffer: &Buffer) -> *mut TF_Buffer {
-    buffer.raw
-}
-
-pub fn reset(buffer: &mut Buffer) {
-    let (pointer, length) = unsafe { ((*buffer.raw).data, (*buffer.raw).length) };
-    let mut memory = Memory::from_raw(pointer as *mut _, length as usize);
-    mem::swap(&mut buffer.memory, &mut memory);
 }
