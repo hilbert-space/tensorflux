@@ -48,11 +48,10 @@ impl<T> Tensor<T> where T: Value {
         let pointer = nonnull!(ffi!(TF_TensorData(raw))) as *mut _;
         let dimensions = (0..ffi!(TF_NumDims(raw))).map(|i| ffi!(TF_Dim(raw, i)))
                                                    .collect::<Vec<_>>();
-        let memory = if dimensions.is_empty() {
-            Memory::from_raw_parts(pointer, 0)
-        } else {
-            Memory::from_raw_parts(pointer, dimensions.iter().fold(1, |p, &d| p * d as usize))
+        let length = if dimensions.is_empty() { 0 } else {
+            dimensions.iter().fold(1, |p, &d| p * d as usize)
         };
+        let memory = unsafe { Memory::from_raw_parts(pointer, length) };
         Ok(Tensor { dimensions: dimensions, memory: memory, raw: raw })
     }
 }

@@ -132,7 +132,7 @@ impl Session {
         }
 
         if let Some(buffer) = metadata {
-            buffer.reset();
+            unsafe { buffer.reset() };
         }
 
         Ok(())

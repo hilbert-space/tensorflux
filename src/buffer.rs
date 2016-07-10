@@ -21,6 +21,12 @@ impl Buffer {
         Memory::new(data).into()
     }
 
+    /// Create a buffer from raw parts.
+    #[inline]
+    pub unsafe fn from_raw_parts(pointer: *mut u8, length: usize) -> Buffer {
+        Memory::from_raw_parts(pointer, length).into()
+    }
+
     /// Load a buffer.
     pub fn load<T>(path: T) -> Result<Self> where T: AsRef<Path> {
         let mut data = vec![];
@@ -36,13 +42,7 @@ impl Buffer {
     }
 
     #[doc(hidden)]
-    #[inline]
-    pub fn from_raw_parts(data: *mut u8, length: usize) -> Buffer {
-        Memory::from_raw_parts(data, length).into()
-    }
-
-    #[doc(hidden)]
-    pub fn reset(&mut self) {
+    pub unsafe fn reset(&mut self) {
         let mut memory = Memory::from_raw_parts(self.raw.data as *mut _, self.raw.length as usize);
         mem::swap(&mut self.memory, &mut memory);
     }

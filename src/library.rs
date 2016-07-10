@@ -21,7 +21,7 @@ impl Library {
     /// Return the operations defined in the library.
     pub fn operations(&self) -> Buffer {
         let buffer = ffi!(TF_GetOpList(self.raw));
-        Buffer::from_raw_parts(buffer.data as *mut _, buffer.length as usize)
+        unsafe { Buffer::from_raw_parts(buffer.data as *mut _, buffer.length as usize) }
     }
 }
 
