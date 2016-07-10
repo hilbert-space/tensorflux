@@ -27,11 +27,24 @@ impl Buffer {
     }
 
     /// Load a buffer.
-    pub fn load<T: AsRef<Path>>(path: T) -> Result<Self> {
+    pub fn load<T>(path: T) -> Result<Self> where T: AsRef<Path> {
         let mut data = vec![];
         let mut file = ok!(File::open(path));
         ok!(file.read_to_end(&mut data));
         Buffer::new(data)
+    }
+
+    #[doc(hidden)]
+    #[inline]
+    pub fn as_raw(&self) -> *mut TF_Buffer {
+        self.raw
+    }
+
+    #[doc(hidden)]
+    pub fn reset(&mut self) {
+        let (pointer, length) = unsafe { ((*self.raw).data, (*self.raw).length) };
+        let mut memory = Memory::from_raw(pointer as *mut _, length as usize);
+        mem::swap(&mut self.memory, &mut memory);
     }
 }
 
@@ -42,15 +55,4 @@ impl Drop for Buffer {
     fn drop(&mut self) {
         ffi!(TF_DeleteBuffer(self.raw));
     }
-}
-
-#[inline]
-pub fn as_raw(buffer: &Buffer) -> *mut TF_Buffer {
-    buffer.raw
-}
-
-pub fn reset(buffer: &mut Buffer) {
-    let (pointer, length) = unsafe { ((*buffer.raw).data, (*buffer.raw).length) };
-    let mut memory = Memory::from_raw(pointer as *mut _, length as usize);
-    mem::swap(&mut buffer.memory, &mut memory);
 }

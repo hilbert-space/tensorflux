@@ -4,10 +4,10 @@ use std::ffi::CString;
 use std::{mem, ptr};
 
 use Result;
-use buffer::{self, Buffer};
-use options::{self, Options};
-use status::{self, Status};
-use tensor::{self, Tensor};
+use buffer::Buffer;
+use options::Options;
+use status::Status;
+use tensor::Tensor;
 use value::Value;
 
 /// A session.
@@ -42,8 +42,7 @@ impl Session {
     /// Create a session.
     pub fn new(options: &Options) -> Result<Self> {
         let status = try!(Status::new());
-        let raw = nonnull!(ffi!(TF_NewSession(options::as_raw(options), status::as_raw(&status))),
-                           &status);
+        let raw = nonnull!(ffi!(TF_NewSession(options.as_raw(), status.as_raw())), &status);
         Ok(Session { status: status, raw: raw })
     }
 
@@ -59,8 +58,7 @@ impl Session {
     pub fn extend(&mut self, definition: &Buffer) -> Result<()> {
         let definition = definition.as_ref();
         ok!(ffi!(TF_ExtendGraph(self.raw, definition.as_ptr() as *const _,
-                                definition.len() as size_t, status::as_raw(&self.status))),
-            &self.status);
+                                definition.len() as size_t, self.status.as_raw())), &self.status);
         Ok(())
     }
 
@@ -113,13 +111,13 @@ impl Session {
         }
 
         let options_buffer = if let Some(buffer) = options {
-            buffer::as_raw(buffer)
+            buffer.as_raw()
         } else {
             ptr::null_mut()
         };
 
         let metadata_buffer = if let Some(ref buffer) = metadata {
-            buffer::as_raw(buffer)
+            buffer.as_raw()
         } else {
             ptr::null_mut()
         };
@@ -127,15 +125,14 @@ impl Session {
         ok!(ffi!(TF_Run(self.raw, options_buffer, input_names.as_mut_ptr(),
                         input_tensors.as_mut_ptr(), ni as c_int, output_names.as_mut_ptr(),
                         output_tensors.as_mut_ptr(), no as c_int, target_names.as_mut_ptr(),
-                        nt as c_int, metadata_buffer, status::as_raw(&self.status))),
-            &self.status);
+                        nt as c_int, metadata_buffer, self.status.as_raw())), &self.status);
 
         for i in 0..no {
             outputs[i].set(output_tensors[i]);
         }
 
         if let Some(buffer) = metadata {
-            buffer::reset(buffer);
+            buffer.reset();
         }
 
         Ok(())
@@ -145,8 +142,8 @@ impl Session {
 impl Drop for Session {
     #[inline]
     fn drop(&mut self) {
-        ffi!(TF_CloseSession(self.raw, status::as_raw(&self.status)));
-        ffi!(TF_DeleteSession(self.raw, status::as_raw(&self.status)));
+        ffi!(TF_CloseSession(self.raw, self.status.as_raw()));
+        ffi!(TF_DeleteSession(self.raw, self.status.as_raw()));
     }
 }
 
@@ -186,7 +183,7 @@ impl Output {
     /// Extract the tensor.
     pub fn get<T>(&mut self) -> Result<Tensor<T>> where T: Value {
         match self.tensor.take() {
-            Some(tensor) => tensor::from_raw(tensor),
+            Some(tensor) => Tensor::from_raw(tensor),
             _ => raise!("the tensor has not been set"),
         }
     }
@@ -219,7 +216,7 @@ impl Target {
 impl<T> Flexor for Tensor<T> where T: Value {
     #[inline]
     fn copy_raw(&self) -> Result<*mut TF_Tensor> {
-        tensor::copy_raw(self)
+        self.copy_raw()
     }
 
     #[inline]

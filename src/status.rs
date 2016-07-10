@@ -10,6 +10,11 @@ impl Status {
     pub fn new() -> Result<Self> {
         Ok(Status { raw: nonnull!(ffi!(TF_NewStatus())) })
     }
+
+    #[inline]
+    pub fn as_raw(&self) -> *mut TF_Status {
+        self.raw
+    }
 }
 
 impl Drop for Status {
@@ -17,9 +22,4 @@ impl Drop for Status {
     fn drop(&mut self) {
         ffi!(TF_DeleteStatus(self.raw));
     }
-}
-
-#[inline]
-pub fn as_raw(status: &Status) -> *mut TF_Status {
-    status.raw
 }
