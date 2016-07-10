@@ -19,7 +19,7 @@ impl Options {
         Ok(Options { target: None, raw: nonnull!(ffi!(TF_NewSessionOptions())) })
     }
 
-    /// Configure using a protocol buffer.
+    /// Set the configuration using a protocol buffer.
     ///
     /// The scheme of the `configuration` protocol buffer is called
     /// `ConfigProto`, and it can be found in TensorFlow’s [repository][1].
