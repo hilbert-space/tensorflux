@@ -117,7 +117,7 @@ macro_rules! raise(
 
 macro_rules! success(
     ($status:expr) => (
-        if let Some(error) = ::error::from_status($status) {
+        if let Some(error) = ::error::Error::from_status($status) {
             return Err(error);
         }
     );
