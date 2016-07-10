@@ -15,16 +15,17 @@ pub struct Tensor<T> {
 
 impl<T> Tensor<T> where T: Value {
     /// Create a tensor.
-    pub fn new(mut data: Vec<T>, dimensions: &[usize]) -> Result<Self> {
+    pub fn new(data: Vec<T>, dimensions: &[usize]) -> Result<Self> {
         let (given, needed) = (data.len(), dimensions.iter().fold(1, |p, &d| p * d));
         if needed > given {
             raise!("there should be at least {} data point(s)", needed);
         }
         let dimensions = dimensions.iter().map(|&d| d as c_longlong).collect::<Vec<_>>();
+        let memory = Memory::new(data);
         let raw = nonnull!(ffi!(TF_NewTensor(T::kind(), dimensions.as_ptr() as *mut _,
-                                dimensions.len() as c_int, data.as_mut_ptr() as *mut _,
+                                dimensions.len() as c_int, memory.as_ptr() as *mut _,
                                 needed as size_t, Some(noop), ptr::null_mut())));
-        Ok(Tensor { dimensions: dimensions, memory: Memory::new(data), raw: raw })
+        Ok(Tensor { dimensions: dimensions, memory: memory, raw: raw })
     }
 
     /// Return the dimensions.
@@ -47,10 +48,12 @@ impl<T> Tensor<T> where T: Value {
         let pointer = nonnull!(ffi!(TF_TensorData(raw))) as *mut _;
         let dimensions = (0..ffi!(TF_NumDims(raw))).map(|i| ffi!(TF_Dim(raw, i)))
                                                    .collect::<Vec<_>>();
-        let length = if dimensions.is_empty() { 0 } else {
-            dimensions.iter().fold(1, |p, &d| p * d as usize)
+        let memory = if dimensions.is_empty() {
+            Memory::from_raw_parts(pointer, 0)
+        } else {
+            Memory::from_raw_parts(pointer, dimensions.iter().fold(1, |p, &d| p * d as usize))
         };
-        Ok(Tensor { dimensions: dimensions, memory: Memory::from_raw(pointer, length), raw: raw })
+        Ok(Tensor { dimensions: dimensions, memory: memory, raw: raw })
     }
 }
 

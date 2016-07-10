@@ -13,7 +13,7 @@ impl<T> Memory<T> {
     }
 
     #[inline]
-    pub fn from_raw(pointer: *mut T, length: usize) -> Self {
+    pub fn from_raw_parts(pointer: *mut T, length: usize) -> Self {
         let data = unsafe { Vec::from_raw_parts(pointer, length, length) };
         Memory { data: data, owned: false }
     }
