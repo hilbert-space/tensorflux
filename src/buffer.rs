@@ -50,6 +50,7 @@ impl Buffer {
 
 memory!(Buffer<u8>);
 
+#[doc(hidden)]
 impl From<Memory<u8>> for Buffer {
     fn from(memory: Memory<u8>) -> Self {
         let raw = TF_Buffer {
