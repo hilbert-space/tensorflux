@@ -2,7 +2,6 @@ use ffi::TF_Buffer;
 use libc::size_t;
 use std::fs::File;
 use std::io::Read;
-use std::mem;
 use std::path::Path;
 
 use Result;
@@ -43,8 +42,7 @@ impl Buffer {
 
     #[doc(hidden)]
     pub unsafe fn reset(&mut self) {
-        let mut memory = Memory::from_raw_parts(self.raw.data as *mut _, self.raw.length as usize);
-        mem::swap(&mut self.memory, &mut memory);
+        self.memory = Memory::from_raw_parts(self.raw.data as *mut _, self.raw.length as usize);
     }
 }
 
