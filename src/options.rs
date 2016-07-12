@@ -1,7 +1,6 @@
 use ffi::TF_SessionOptions;
 use libc::size_t;
 use std::ffi::CString;
-use std::mem;
 
 use Result;
 use buffer::Buffer;
@@ -37,7 +36,7 @@ impl Options {
     pub fn target<T>(&mut self, target: T) where T: Into<String> {
         let target = into_cstring!(target);
         ffi!(TF_SetTarget(self.raw, target.as_ptr()));
-        mem::replace(&mut self.target, Some(target));
+        self.target = Some(target);
     }
 
     #[doc(hidden)]
