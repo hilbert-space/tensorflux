@@ -39,7 +39,7 @@ fn main() {
 fn generate<T: Source>(w: f32, b: f32, n: usize, mut source: T) -> (Vec<f32>, Vec<f32>) {
     let (mut x, mut y) = (vec![0.0; n], vec![0.0; n]);
     for i in 0..n {
-        x[i] = (2.0 * source.read::<f64>() - 1.0) as f32;
+        x[i] = 2.0 * source.read::<f32>() - 1.0;
         y[i] = w * x[i] + b;
     }
     (x, y)
