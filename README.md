@@ -46,6 +46,12 @@ This and other examples can be found in the [examples](examples) directory.
 
 ## [Configuration][configuration]
 
+## Collaboration
+
+Rust has an IRC culture, and most real-time collaborations happen in a variety
+of channels on Mozilla’s IRC network, irc.mozilla.org. The channels that are
+relevant to TensorFlow are #rust-machine-learning and #rust-tensorflow.
+
 ## Contribution
 
 Your contribution is highly appreciated. Do not hesitate to open an issue or a
