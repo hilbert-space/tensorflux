@@ -2,7 +2,7 @@ use ffi::TF_Code;
 use std::ffi::CStr;
 use std::{error, fmt};
 
-use status:: Status;
+use status::Status;
 
 /// An error.
 #[derive(Clone, Debug)]
