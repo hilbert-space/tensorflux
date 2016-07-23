@@ -1,5 +1,5 @@
 use ffi::TF_Tensor;
-use libc::{c_int, c_longlong, c_void, size_t};
+use libc::{c_int, c_void, int64_t, size_t};
 use std::ptr;
 
 use Result;
@@ -8,7 +8,7 @@ use value::Value;
 
 /// A tensor.
 pub struct Tensor<T> {
-    dimensions: Vec<c_longlong>,
+    dimensions: Vec<int64_t>,
     memory: Memory<T>,
     raw: *mut TF_Tensor,
 }
@@ -20,9 +20,9 @@ impl<T> Tensor<T> where T: Value {
         if needed > given {
             raise!("there should be at least {} data point(s)", needed);
         }
-        let dimensions = dimensions.iter().map(|&d| d as c_longlong).collect::<Vec<_>>();
+        let dimensions = dimensions.iter().map(|&d| d as int64_t).collect::<Vec<_>>();
         let memory = Memory::new(data);
-        let raw = nonnull!(ffi!(TF_NewTensor(T::kind(), dimensions.as_ptr() as *mut _,
+        let raw = nonnull!(ffi!(TF_NewTensor(T::kind(), dimensions.as_ptr(),
                                 dimensions.len() as c_int, memory.as_ptr() as *mut _,
                                 needed as size_t, Some(noop), ptr::null_mut())));
         Ok(Tensor { dimensions: dimensions, memory: memory, raw: raw })
@@ -35,7 +35,7 @@ impl<T> Tensor<T> where T: Value {
 
     #[doc(hidden)]
     pub fn copy_raw(&self) -> Result<*mut TF_Tensor> {
-        Ok(nonnull!(ffi!(TF_NewTensor(T::kind(), self.dimensions.as_ptr() as *mut _,
+        Ok(nonnull!(ffi!(TF_NewTensor(T::kind(), self.dimensions.as_ptr(),
                          self.dimensions.len() as c_int, self.as_ptr() as *mut _,
                          self.len() as size_t, Some(noop), ptr::null_mut()))))
     }
