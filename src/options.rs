@@ -1,6 +1,5 @@
 use ffi::TF_SessionOptions;
 use libc::size_t;
-use std::ffi::CString;
 
 use Result;
 use buffer::Buffer;
@@ -8,14 +7,13 @@ use status::Status;
 
 /// Options.
 pub struct Options {
-    target: Option<CString>,
     raw: *mut TF_SessionOptions,
 }
 
 impl Options {
     /// Create options.
     pub fn new() -> Result<Self> {
-        Ok(Options { target: None, raw: nonnull!(ffi!(TF_NewSessionOptions())) })
+        Ok(Options { raw: nonnull!(ffi!(TF_NewSessionOptions())) })
     }
 
     /// Set the configuration using a protocol buffer.
@@ -36,7 +34,6 @@ impl Options {
     pub fn target<T>(&mut self, target: T) where T: Into<String> {
         let target = into_cstring!(target);
         ffi!(TF_SetTarget(self.raw, target.as_ptr()));
-        self.target = Some(target);
     }
 
     #[doc(hidden)]
