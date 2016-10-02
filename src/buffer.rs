@@ -54,7 +54,7 @@ impl From<Memory<u8>> for Buffer {
         let raw = TF_Buffer {
             data: memory.as_ptr() as *mut _,
             length: memory.len() as size_t,
-            data_deallocator: None,
+            deallocator: None,
         };
         Buffer { memory: memory, raw: raw }
     }

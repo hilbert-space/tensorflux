@@ -1,16 +1,16 @@
 language: rust
-sudo: false
+sudo: required
 
 cache: cargo
 rust: nightly
 
 install:
-  - export CC="gcc-4.9" CXX="g++-4.9"
+  - export CC="gcc-5" CXX="g++-5"
   - curl -LO https://stainless-steel.github.io/travis/bazel.sh && source bazel.sh
 
 script:
-  - cargo test -vv -j 1
-  - cargo test -vv -j 1 --features=complex
+  - cargo test -vv
+  - cargo test -vv --features=complex
   - cargo run --example=multiplication
   - cargo run --example=regression
 
@@ -28,8 +28,8 @@ addons:
       - ubuntu-toolchain-r-test
 
     packages:
-      - g++-4.9
-      - gcc-4.9
+      - g++-5
+      - gcc-5
       - oracle-java8-installer
       - python-numpy
       - swig
