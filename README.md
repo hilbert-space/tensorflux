@@ -3,6 +3,7 @@
 The package provides an interface to [TensorFlow][tensorflow].
 
 ## [Documentation][documentation]
+[![Chat on IRC](https://img.shields.io/badge/mozilla-%tensorflow-brightgreen.svg)](irc://irc.mozilla.org/rust-tensorflow)
 
 ## [Example](examples/multiplication.rs)
 
