@@ -1,4 +1,5 @@
-# TensorFlux [![Version][version-icon]][version-page] [![Status][status-icon]][status-page]
+# TensorFlux [![Version][version-icon]][version-page] [![Status][status-icon]][status-page] [![Chat on irc] (https://img.shields.io/badge/chat-on%20mozilla%20rust--tensorflow-brightgreen.svg)](irc://irc.mozilla.org/rust-metrics)
+
 
 The package provides an interface to [TensorFlow][tensorflow].
 
